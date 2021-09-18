@@ -23,12 +23,17 @@ end
 
 function renamer.rename(word)
     local cword = word or vim.fn.expand('<cword>')
-    local line, col = renamer._get_cursor()
+    local col = vim.api.nvim_win_get_cursor(0)[2]
     local word_start, word_end = renamer._get_word_boundaries_in_line(
         vim.api.nvim_get_current_line(),
         cword,
-        col
-    )
+        col)
+    local word_mid_col = word_start + math.floor((word_end - word_start) / 2)
+    local prompt_col_no = word_mid_col - col
+    local prompt_col_no_prefix = ''
+    if prompt_col_no > 0 then
+        prompt_col_no_prefix = '+'
+    end
 
     local popup_opts = {
         title = renamer.title,
@@ -36,17 +41,23 @@ function renamer.rename(word)
         border = renamer.border,
         borderchars = renamer.border_chars,
         width = #renamer.title + 4,
-        line = line + 1,
-        col = word_start + math.floor((word_end - word_start) / 2),
+        line = 'cursor+2',
+        col = 'cursor' .. prompt_col_no_prefix .. prompt_col_no,
         cursor_line = true,
         enter = true,
         callback = function() print('Hello World!') end,
     }
+    print(popup_opts.line, popup_opts.col)
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
     renamer._buffers[prompt_win_id] = prompt_opts
 
     renamer._setup_window(prompt_win_id)
     renamer._set_prompt_win_style(prompt_win_id)
+end
+
+function renamer.on_submit(window_id)
+    popup.execute_callback(window_id)
+    renamer.on_close(window_id)
 end
 
 function renamer.on_close(window_id)
@@ -77,17 +88,6 @@ function renamer.on_close(window_id)
     delete_window(border_win_id)
 end
 
-function renamer._get_cursor()
-    --[[
-    --  'cursor' is a list containing 2 elements, with the following meaning:
-    --      * 'cursor[1]' - The current line number
-    --      * 'cursor[2]' - The current column number
-    --]]
-    local cursor = vim.api.nvim_win_get_cursor(0)
-
-    return cursor[1], cursor[2]
-end
-
 function renamer._get_word_boundaries_in_line(line, word, line_pos)
     local i = 1
     local word_start, word_end = string.find(line, word, line_pos - i)
@@ -112,10 +112,18 @@ function renamer._setup_window(prompt_win_id)
 
     vim.cmd [[startinsert]]
     renamer._create_autocmds(prompt_win_id)
+
+    vim.api.nvim_buf_set_keymap(
+        prompt_buf_id,
+        'i',
+        '<CR>',
+        '<cmd>lua require\'renamer\'.on_submit(' .. prompt_buf_id .. ')<CR>',
+        {noremap = true})
 end
 
 function renamer._set_prompt_win_style(prompt_win_id)
     if prompt_win_id then
+        vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
         vim.api.nvim_win_set_option(prompt_win_id, 'winhl', 'Normal:RenamerNormal')
         vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
 
