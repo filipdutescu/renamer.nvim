@@ -42,55 +42,56 @@ function renamer.rename(word)
         enter = true,
         callback = function() print('Hello World!') end,
     }
-    local prompt_buf_no, prompt_opt = popup.create(cword, popup_opts)
-    local prompt_buf = vim.api.nvim_win_get_buf(prompt_buf_no)
-    renamer._buffers[prompt_buf_no] = prompt_buf
+    local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
+    local prompt_buf_id = vim.api.nvim_win_get_buf(prompt_win_id)
+    renamer._buffers[prompt_win_id] = prompt_opts
+
+    vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
+    vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
+    if renamer.prefix ~= '' then
+        vim.api.nvim_buf_set_option(prompt_win_id, 'buftype', 'prompt')
+        vim.fn.prompt_setprompt(prompt_buf_id, renamer.prefix)
+    end
 
     local on_leave = string.format(
-        -- [[  autocmd BufLeave,WinLeave,InsertLeave <buffer> ++nested ++once :silent lua require'renamer'.on_close(%s)]],
-        [[  autocmd BufLeave,WinLeave,InsertLeave <buffer> ++nested ++once lua require'renamer'.on_close(%s)]],
-        prompt_buf_no
+        [[  autocmd BufLeave,WinLeave,InsertLeave <buffer> ++nested ++once :silent lua require'renamer'.on_close(%s)]],
+        prompt_win_id
     )
-
-    vim.api.nvim_win_set_option(prompt_buf_no, 'wrap', false)
-    vim.api.nvim_win_set_option(prompt_buf_no, 'winblend', 0)
-    if renamer.prefix ~= '' then
-        vim.api.nvim_buf_set_option(prompt_buf_no, 'buftype', 'prompt')
-        vim.fn.prompt_setprompt(prompt_buf, renamer.prefix)
-    end
     vim.cmd [[startinsert]]
-
     vim.cmd [[augroup RenamerInsert]]
     vim.cmd [[  au!]]
     vim.cmd(on_leave)
     vim.cmd [[augroup end]]
 end
 
-function renamer.on_close(window_no)
-    local delete_window = function(win_no)
-        if (not win_no == nil)
-            and vim.api.nvim_win_is_valid(win_no)
+function renamer.on_close(window_id)
+    local delete_window = function(win_id)
+        if (not win_id == nil)
+            and vim.api.nvim_win_is_valid(win_id)
             and renamer._buffers
-            and renamer._buffers[win_no] then
-            local buf_no = renamer._buffers[win_no]
-            if vim.api.nvim_buf_is_valid(buf_no) and not vim.api.nvim_buf_get_option(buf_no, 'buflisted') then
-                vim.cmd(string.format('silent! bdelete! %s', buf_no))
+            and renamer._buffers[win_id] then
+            local buf_id = vim.api.nvim_win_get_buf(win_id)
+            if vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
+                vim.cmd(string.format('silent! bdelete! %s', buf_id))
             end
 
-            if vim.api.nvim_win_is_valid(win_no) then
-                if not pcall(vim.api.nvim_win_close, win_no, true) then
-                    log.trace('Failed to close window: rename_prompt_win/' .. win_no)
+            if vim.api.nvim_win_is_valid(win_id) then
+                if not pcall(vim.api.nvim_win_close, win_id, true) then
+                    log.trace('Failed to close window: rename_prompt_win/' .. win_id)
                 end
             end
         end
 
-        if (not win_no == nil) and renamer._buffers and renamer._buffers[win_no] then
-            renamer._buffers[win_no] = nil
+        if (not win_id == nil) and renamer._buffers and renamer._buffers[win_id] then
+            renamer._buffers[win_id] = nil
         end
     end
 
-    delete_window(window_no)
-    vim.defer_fn(function() delete_window(window_no) end, 10)
+    local opts = renamer._buffers[window_id]
+    local border_win_id = opts and opts.border and opts.border.win_id
+    delete_window(window_id)
+    delete_window(border_win_id)
+    --vim.defer_fn(function() delete_window(window_no) end, 10)
 end
 
 function renamer._get_cursor()
