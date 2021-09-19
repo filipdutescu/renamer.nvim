@@ -23,16 +23,20 @@ end
 
 function renamer.rename(word)
     local cword = word or vim.fn.expand('<cword>')
-    local col = vim.api.nvim_win_get_cursor(0)[2]
-    local word_start, word_end = renamer._get_word_boundaries_in_line(
+    local line, col = renamer._get_cursor()
+    local word_start, _ = renamer._get_word_boundaries_in_line(
         vim.api.nvim_get_current_line(),
         cword,
         col)
-    local word_mid_col = word_start + math.floor((word_end - word_start) / 2)
-    local prompt_col_no = word_mid_col - col
-    local prompt_col_no_prefix = ''
-    if prompt_col_no > 0 then
-        prompt_col_no_prefix = '+'
+    local prompt_col_no = col - word_start + 1
+    local prompt_line_no = 2
+    local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
+
+    if not renamer.border == true then
+        prompt_line_no = 1
+    end
+    if lines_from_win_end < prompt_line_no + 1 then
+        prompt_line_no = -prompt_line_no
     end
 
     local popup_opts = {
@@ -41,18 +45,23 @@ function renamer.rename(word)
         border = renamer.border,
         borderchars = renamer.border_chars,
         width = #renamer.title + 4,
-        line = 'cursor+2',
-        col = 'cursor' .. prompt_col_no_prefix .. prompt_col_no,
+        line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no,
+        col = 'cursor-' .. prompt_col_no,
         cursor_line = true,
         enter = true,
         callback = function() print('Hello World!') end,
     }
     print(popup_opts.line, popup_opts.col)
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
-    renamer._buffers[prompt_win_id] = prompt_opts
 
+    renamer._buffers[prompt_win_id] = {
+        opts = popup_opts,
+        border_opts = prompt_opts.border
+    }
     renamer._setup_window(prompt_win_id)
     renamer._set_prompt_win_style(prompt_win_id)
+
+    return prompt_win_id, renamer._buffers[prompt_win_id]
 end
 
 function renamer.on_submit(window_id)
@@ -83,9 +92,20 @@ function renamer.on_close(window_id)
     end
 
     local opts = renamer._buffers[window_id]
-    local border_win_id = opts and opts.border and opts.border.win_id
+    local border_win_id = opts and opts.border_opts and opts.border_opts.win_id
     delete_window(window_id)
     delete_window(border_win_id)
+end
+
+function renamer._get_cursor()
+    -- [[
+    -- `cursor` is an array of two elements with the following semnification:
+    --      - *`cursor[1]`* - the current cursor line
+    --      - *`cursor[2]`* - the current cursor column
+    -- ]]
+    local cursor = vim.api.nvim_win_get_cursor(0)
+
+    return cursor[1], cursor[2]
 end
 
 function renamer._get_word_boundaries_in_line(line, word, line_pos)
@@ -129,7 +149,7 @@ function renamer._set_prompt_win_style(prompt_win_id)
 
         if renamer._buffers and renamer._buffers[prompt_win_id] then
             local opts = renamer._buffers[prompt_win_id]
-            local border_win_id = opts.border and opts.border.win_id
+            local border_win_id = opts.border_opts and opts.border_opts.win_id
 
             renamer._set_prompt_border_win_style(border_win_id)
         end
@@ -138,6 +158,7 @@ end
 
 function renamer._set_prompt_border_win_style(prompt_border_win_id)
    if prompt_border_win_id then
+        vim.api.nvim_win_set_option(prompt_border_win_id, 'wrap', false)
         vim.api.nvim_win_set_option(prompt_border_win_id, 'winhl', 'Normal:RenamerNormal')
         vim.api.nvim_win_set_option(prompt_border_win_id, 'winblend', 0)
    end
