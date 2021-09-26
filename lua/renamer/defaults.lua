@@ -3,6 +3,7 @@ local defaults = {
     padding = { 0, 0, 0, 0 },
     border = true,
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    -- prefix = '> ',
     prefix = '',
 }
 
