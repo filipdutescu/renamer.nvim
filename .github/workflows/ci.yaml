@@ -1,0 +1,62 @@
+name: Renamer.nvim CI
+
+on: [ push, pull_request ]
+
+jobs:
+  unit_tests:
+    name: Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }} 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: 'ubuntu-latest'
+            url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz'
+            manager: 'sudo apt'
+            packages: '-y fd-find'
+          - os: 'macos-10.15'
+            url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz'
+            manager: 'brew'
+            packages: 'fd'
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Get today's date
+        run: date +%F > todays-date
+
+      - name: Restore from today's cache
+        uses: actions/cache@v2
+        with:
+          path: ~/_neovim
+          key: ${{ runner.os }}-${{ matrix.url }}-${{ hashFiles('todays-date') }}
+
+      - name: Setup environment
+        run: |
+          ${{ matrix.manager }} update
+          ${{ matrix.manager }} install ${{ matrix.packages }}
+          test -d _neovim || {
+            mkdir -p _neovim
+            curl -sL ${{ matrix.url }} | tar xzf - --strip-components=1 -C ~/_neovim
+          }
+          mkdir -p ~/.local/share/nvim/site/pack/vendor/start
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/vendor/start/plenary.nvim
+          ln -s ${{ github.workspace }} ~/.local/share/nvim/site/pack/vendor/start
+
+      - name: Run tests
+        run: |
+          export PATH="${HOME}/_neovim/bin:${PATH}"
+          export VIM="${HOME}/_neovim/share/nvim/runtime"
+          nvim --version
+          make test
+
+  stylua:
+    name: Style linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: JohnnyMorganz/stylua-action@1.0.0
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --color always --check lua/
+
