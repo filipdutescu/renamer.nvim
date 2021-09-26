@@ -1,10 +1,10 @@
-local renamer = reqiure'renamer'
+local renamer = require 'renamer'
 
 local eq = assert.are.same
 
 describe('renamer', function()
     describe('setup', function()
-        local defaults = require'renamer.defaults'
+        local defaults = require 'renamer.defaults'
 
         it('should use defaults if no options are passed', function()
             renamer.setup()
@@ -17,7 +17,7 @@ describe('renamer', function()
             eq(renamer._buffers, {})
         end)
 
-        it('should use defaults where no options are passed (\'title\' passed)', function()
+        it('should use defaults where no options are passed ("title" passed)', function()
             local opts = {
                 title = 'abc',
             }
@@ -32,7 +32,7 @@ describe('renamer', function()
             eq(renamer._buffers, {})
         end)
 
-        it('should use defaults where no options are passed (\'padding\' passed)', function()
+        it('should use defaults where no options are passed ("padding" passed)', function()
             local opts = {
                 padding = { 1, 2, 3, 4 },
             }
@@ -47,7 +47,7 @@ describe('renamer', function()
             eq(renamer._buffers, {})
         end)
 
-        it('should use defaults where no options are passed (\'border\' passed)', function()
+        it('should use defaults where no options are passed ("border" passed)', function()
             local opts = {
                 border = true,
             }
@@ -62,7 +62,7 @@ describe('renamer', function()
             eq(renamer._buffers, {})
         end)
 
-        it('should use defaults where no options are passed (\'border_chars\' passed)', function()
+        it('should use defaults where no options are passed ("border_chars" passed)', function()
             local opts = {
                 border_chars = { '═', '║', '═', '║', '╔', '╗', '╝', '╚' },
             }
@@ -77,7 +77,7 @@ describe('renamer', function()
             eq(renamer._buffers, {})
         end)
 
-        it('should use defaults where no options are passed (\'prefix\' passed)', function()
+        it('should use defaults where no options are passed ("prefix" passed)', function()
             local opts = {
                 prefix = '> ',
             }
@@ -112,4 +112,3 @@ describe('renamer', function()
         end)
     end)
 end)
-

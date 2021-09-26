@@ -1,16 +1,16 @@
-local log = require'plenary.log'.new {
+local log = require('plenary.log').new {
     plugin = 'renamer',
     level = 'warn',
 }
-local popup = require'plenary.popup'
-local utils = require'renamer.utils'
+local popup = require 'plenary.popup'
+local utils = require 'renamer.utils'
 
 local renamer = {}
 
 function renamer.setup(opts)
     opts = opts or {}
 
-    local defaults = require'renamer.defaults'
+    local defaults = require 'renamer.defaults'
 
     renamer.title = utils.get_value_or_default(opts, 'title', defaults.title)
     renamer.padding = utils.get_value_or_default(opts, 'padding', defaults.padding)
@@ -22,12 +22,9 @@ function renamer.setup(opts)
 end
 
 function renamer.rename()
-    local cword = vim.fn.expand('<cword>')
+    local cword = vim.fn.expand '<cword>'
     local line, col = renamer._get_cursor()
-    local word_start, _ = renamer._get_word_boundaries_in_line(
-        vim.api.nvim_get_current_line(),
-        cword,
-        col)
+    local word_start, _ = renamer._get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col)
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
 
@@ -51,13 +48,13 @@ function renamer.rename()
         posinvert = false,
         cursor_line = true,
         enter = true,
-        initial_mode = vim.api.nvim_get_mode().mode
+        initial_mode = vim.api.nvim_get_mode().mode,
     }
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
 
     renamer._buffers[prompt_win_id] = {
         opts = popup_opts,
-        border_opts = prompt_opts.border
+        border_opts = prompt_opts.border,
     }
     renamer._setup_window(prompt_win_id)
     renamer._set_prompt_win_style(prompt_win_id)
@@ -91,7 +88,7 @@ function renamer.on_close(window_id)
             if vim.api.nvim_win_is_valid(win_id) then
                 vim.api.nvim_win_close(win_id, true)
                 if not pcall(vim.api.nvim_win_close, win_id, true) then
-                   log.trace('Failed to close window: rename_prompt_win/' .. win_id)
+                    log.trace('Failed to close window: rename_prompt_win/' .. win_id)
                 end
             end
         end
@@ -149,8 +146,9 @@ function renamer._setup_window(prompt_win_id)
         prompt_buf_id,
         'i',
         '<cr>',
-        '<cmd>lua require\'renamer\'.on_submit(' .. prompt_win_id .. ')<cr>',
-        { noremap = true })
+        "<cmd>lua require('renamer').on_submit(" .. prompt_win_id .. ')<cr>',
+        { noremap = true }
+    )
 end
 
 function renamer._set_prompt_win_style(prompt_win_id)
@@ -166,7 +164,8 @@ function renamer._set_prompt_win_style(prompt_win_id)
                 'RenamerPrefix',
                 0,
                 0,
-                #renamer.prefix + 1)
+                #renamer.prefix + 1
+            )
         end
 
         if renamer._buffers and renamer._buffers[prompt_win_id] then
@@ -179,10 +178,10 @@ function renamer._set_prompt_win_style(prompt_win_id)
 end
 
 function renamer._set_prompt_border_win_style(prompt_border_win_id)
-   if prompt_border_win_id then
+    if prompt_border_win_id then
         vim.api.nvim_win_set_option(prompt_border_win_id, 'wrap', false)
         vim.api.nvim_win_set_option(prompt_border_win_id, 'winblend', 0)
-   end
+    end
 end
 
 function renamer._create_autocmds(prompt_win_id)
@@ -203,4 +202,3 @@ function renamer._delete_autocmds()
 end
 
 return renamer
-
