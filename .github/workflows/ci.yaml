@@ -34,7 +34,7 @@ jobs:
         run: |
           ${{ matrix.manager }} update
           ${{ matrix.manager }} install ${{ matrix.packages }}
-          test -d _neovim || {
+          test -d ~/_neovim || {
             mkdir -p _neovim
             curl -sL ${{ matrix.url }} | tar xzf - --strip-components=1 -C ~/_neovim
           }
