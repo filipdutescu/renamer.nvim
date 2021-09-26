@@ -2,7 +2,6 @@ local log = require'plenary.log'.new {
     plugin = 'renamer',
     level = 'warn',
 }
-local aaa = nil -- for testing the plugin
 local popup = require'plenary.popup'
 local utils = require'renamer.utils'
 
