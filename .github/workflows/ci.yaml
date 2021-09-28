@@ -12,12 +12,10 @@ jobs:
         include:
           - os: 'ubuntu-latest'
             url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz'
-            manager: 'sudo apt'
-            packages: '-y fd-find'
+
           - os: 'macos-latest'
             url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz'
-            manager: 'brew'
-            packages: 'fd'
+
     steps:
       - uses: actions/checkout@v2
 
@@ -32,8 +30,6 @@ jobs:
 
       - name: Setup environment
         run: |
-          ${{ matrix.manager }} update
-          ${{ matrix.manager }} install ${{ matrix.packages }}
           test -d ~/_neovim || {
             mkdir -p ~/_neovim
             curl -sL ${{ matrix.url }} | tar xzf - --strip-components=1 -C ~/_neovim
