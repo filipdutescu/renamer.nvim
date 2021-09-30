@@ -10,10 +10,10 @@ describe('defaults', function()
 
         local defaults = require 'renamer.defaults'
 
-        eq(defaults.title, expected_title)
-        eq(defaults.padding, expected_padding)
-        eq(defaults.border, expected_border)
-        eq(defaults.border_chars, expected_border_chars)
-        eq(defaults.prefix, expected_prefix)
+        eq(expected_title, defaults.title)
+        eq(expected_padding, defaults.padding)
+        eq(expected_border, defaults.border)
+        eq(expected_border_chars, defaults.border_chars)
+        eq(expected_prefix, defaults.prefix)
     end)
 end)
