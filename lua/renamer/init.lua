@@ -25,11 +25,15 @@ function renamer.rename()
     local cword = vim.fn.expand '<cword>'
     local line, col = renamer._get_cursor()
     local word_start, _ = renamer._get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col)
-    local prompt_col_no, prompt_line_no = col - word_start + 1, 2
+    local prompt_col_no, prompt_line_no = col - word_start, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
+    local border_highlight = 'RenamerBorder'
 
     if not renamer.border == true then
         prompt_line_no = 1
+        border_highlight = nil
+    else
+        prompt_col_no = prompt_col_no + 1
     end
     if lines_from_win_end < prompt_line_no + 1 then
         prompt_line_no = -prompt_line_no
@@ -41,7 +45,7 @@ function renamer.rename()
         border = renamer.border,
         borderchars = renamer.border_chars,
         highlight = 'RenamerNormal',
-        borderhighlight = 'RenamerBorder',
+        borderhighlight = border_highlight,
         width = #renamer.title + 4,
         line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no,
         col = 'cursor-' .. prompt_col_no,
@@ -69,7 +73,7 @@ function renamer.on_submit(window_id)
 
         if string.match(renamer._buffers[window_id].opts.initial_mode, 'n') then
             renamer._delete_autocmds()
-            vim.cmd [[stopinsert]]
+            vim.api.nvim_command [[stopinsert]]
         end
         renamer.on_close(window_id)
 
@@ -139,7 +143,7 @@ function renamer._setup_window(prompt_win_id)
         vim.fn.prompt_setprompt(prompt_buf_id, renamer.prefix)
     end
 
-    vim.cmd [[startinsert]]
+    vim.api.nvim_command [[startinsert]]
     renamer._create_autocmds(prompt_win_id)
 
     vim.api.nvim_buf_set_keymap(
