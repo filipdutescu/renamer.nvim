@@ -71,13 +71,14 @@ function renamer.on_submit(window_id)
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
 
-        if string.match(renamer._buffers[window_id].opts.initial_mode, 'n') then
-            renamer._delete_autocmds()
+        renamer._delete_autocmds()
+        local initial_mode = renamer._buffers[window_id].opts and renamer._buffers[window_id].opts.initial_mode
+        if initial_mode and not string.match(initial_mode, 'i') then
             vim.api.nvim_command [[stopinsert]]
         end
         renamer.on_close(window_id)
 
-        vim.lsp.buf.rename(new_word)
+        renamer._lsp_rename(new_word)
     end
 end
 
@@ -85,8 +86,8 @@ function renamer.on_close(window_id)
     local delete_window = function(win_id)
         if win_id and vim.api.nvim_win_is_valid(win_id) then
             local buf_id = vim.api.nvim_win_get_buf(win_id)
-            if vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
-                vim.cmd(string.format('silent! bdelete! %s', buf_id))
+            if buf_id and vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
+                vim.api.nvim_command(string.format('silent! bdelete! %s', buf_id))
             end
 
             if vim.api.nvim_win_is_valid(win_id) then
@@ -103,7 +104,7 @@ function renamer.on_close(window_id)
         end
     end
 
-    local opts = renamer._buffers[window_id]
+    local opts = renamer._buffers and renamer._buffers[window_id]
     local border_win_id = opts and opts.border_opts and opts.border_opts.win_id
     delete_window(window_id)
     delete_window(border_win_id)
@@ -203,6 +204,13 @@ function renamer._delete_autocmds()
     vim.cmd [[augroup RenamerInsert]]
     vim.cmd [[  au!]]
     vim.cmd [[augroup end]]
+end
+
+-- [[
+-- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
+-- ]]
+function renamer._lsp_rename(word)
+    vim.lsp.buf.rename(word)
 end
 
 return renamer
