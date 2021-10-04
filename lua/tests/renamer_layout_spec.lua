@@ -15,15 +15,31 @@ describe('renamer', function()
                 renamer.setup()
             end)
 
+            it('should call `_set_prompt_border_win_style`', function()
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_get_cursor.returns { 1, 2 }
+                api_mock.nvim_command.returns()
+                api_mock.nvim_buf_line_count.returns(1)
+                api_mock.nvim_get_mode.returns {}
+                local set_prompt_border_win_style = spy.on(renamer, '_set_prompt_border_win_style')
+                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(popup, 'create').returns(1, { border = { win_id = 1 } })
+
+                renamer.rename()
+
+                assert.spy(set_prompt_border_win_style).was_called_with(1)
+                mock.revert(api_mock)
+            end)
+
             it('should use cursor line for line position if there is enough space below', function()
                 local cursor_line = 1
                 local expected_line_no = 2
                 local expected_line = 'cursor+' .. expected_line_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ cursor_line, 2 })
+                api_mock.nvim_win_get_cursor.returns { cursor_line, 2 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -37,10 +53,10 @@ describe('renamer', function()
                 local expected_line_no = 2
                 local expected_line = 'cursor-' .. expected_line_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, 2 })
+                api_mock.nvim_win_get_cursor.returns { 1, 2 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -54,10 +70,10 @@ describe('renamer', function()
                 local expected_col_no = 2
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, expected_col_no + 1 })
+                api_mock.nvim_win_get_cursor.returns { 1, expected_col_no + 1 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -72,10 +88,10 @@ describe('renamer', function()
                 local expected_col_no = 1
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, cursor_col })
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -91,10 +107,10 @@ describe('renamer', function()
                 local expected_col_no = cursor_col - word_start + 1
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, cursor_col })
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -107,7 +123,7 @@ describe('renamer', function()
 
         describe('without border', function()
             before_each(function()
-                renamer.setup({ border = false })
+                renamer.setup { border = false }
             end)
 
             it('should use cursor line for line position if there is enough space below', function()
@@ -115,10 +131,10 @@ describe('renamer', function()
                 local expected_line_no = 2
                 local expected_line = 'cursor+' .. expected_line_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ cursor_line, 2 })
+                api_mock.nvim_win_get_cursor.returns { cursor_line, 2 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -132,10 +148,10 @@ describe('renamer', function()
                 local expected_line_no = 2
                 local expected_line = 'cursor-' .. expected_line_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, 2 })
+                api_mock.nvim_win_get_cursor.returns { 1, 2 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -149,10 +165,10 @@ describe('renamer', function()
                 local expected_col_no = 1
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, expected_col_no + 1 })
+                api_mock.nvim_win_get_cursor.returns { 1, expected_col_no + 1 }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no + 1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -167,10 +183,10 @@ describe('renamer', function()
                 local expected_col_no = 0
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, cursor_col })
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col + 1, 2)
                 stub(popup, 'create').returns(1, {})
 
@@ -186,10 +202,10 @@ describe('renamer', function()
                 local expected_col_no = cursor_col - word_start + 1
                 local expected_col = 'cursor-' .. expected_col_no
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns({ 1, cursor_col })
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
-                api_mock.nvim_get_mode.returns({})
+                api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
                 stub(popup, 'create').returns(1, {})
 
