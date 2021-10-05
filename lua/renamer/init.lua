@@ -86,7 +86,11 @@ function renamer.on_close(window_id)
     local delete_window = function(win_id)
         if win_id and vim.api.nvim_win_is_valid(win_id) then
             local buf_id = vim.api.nvim_win_get_buf(win_id)
-            if buf_id and vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
+            if
+                buf_id
+                and vim.api.nvim_buf_is_valid(buf_id)
+                and not vim.api.nvim_buf_get_option(buf_id, 'buflisted')
+            then
                 vim.api.nvim_command(string.format('silent! bdelete! %s', buf_id))
             end
 
