@@ -4,17 +4,23 @@ on: [ push, pull_request ]
 
 jobs:
   unit_tests:
-    name: Tests (${{ matrix.os }})
+    name: Tests (${{ matrix.type }} - ${{ matrix.os }})
     runs-on: ${{ matrix.os }} 
     strategy:
       fail-fast: false
       matrix:
         include:
           - os: 'ubuntu-latest'
+            type: 'nightly'
             url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz'
 
           - os: 'macos-latest'
+            type: 'nightly'
             url: 'https://github.com/neovim/neovim/releases/download/nightly/nvim-macos.tar.gz'
+
+          - os: 'ubuntu-latest'
+            type: 'latest'
+            url: 'https://github.com/neovim/neovim/releases/download/$latest_version/nvim-linux64.tar.gz'
 
     steps:
       - uses: actions/checkout@v2
@@ -29,10 +35,23 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.url }}-${{ hashFiles('todays-date') }}
 
       - name: Setup environment
+        if: contains(matrix.type, 'nightly')
         run: |
           test -d ~/_neovim || {
             mkdir -p ~/_neovim
             curl -sL ${{ matrix.url }} | tar xzf - --strip-components=1 -C ~/_neovim
+          }
+          mkdir -p ~/.local/share/nvim/site/pack/vendor/start
+          git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/vendor/start/plenary.nvim
+          ln -s ${{ github.workspace }} ~/.local/share/nvim/site/pack/vendor/start
+
+      - name: Setup environment
+        if: contains(matrix.type, 'latest')
+        run: |
+          test -d ~/_neovim || {
+            mkdir -p ~/_neovim
+            latest_version=$(curl -X GET -sL -D - https://github.com/neovim/neovim/releases/latest -o /dev/null | grep 'location: ' | rev | cut -d '/' -f 1 | rev | sed 's/\r//')
+            curl -sL "${{ matrix.url }}" | tar xzf - --strip-components=1 -C ~/_neovim
           }
           mkdir -p ~/.local/share/nvim/site/pack/vendor/start
           git clone --depth 1 https://github.com/nvim-lua/plenary.nvim ~/.local/share/nvim/site/pack/vendor/start/plenary.nvim
