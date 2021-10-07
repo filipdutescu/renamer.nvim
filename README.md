@@ -5,7 +5,7 @@
 
 `renamer.nvim` is a Visual-Studio-Code-like renaming UI for Neovim, writen in
 Lua. It is considerably customizable and uses the [Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0)
-LSP feature to as its backend.
+LSP feature as its backend.
 
 ## Features
 
