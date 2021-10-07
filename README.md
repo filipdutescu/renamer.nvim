@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/filipdutescu/renamer.nvim/workflows/ci/badge.svg)](https://github.com/filipdutescu/renamer.nvim/actions)
+[![Actions Status](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml/badge.svg)](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/filipdutescu/renamer.nvim)](https://github.com/filipdutescu/renamer.nvim/releases)
 
 # renamer.nvim
@@ -87,6 +87,6 @@ TODO
 
 ## License
 
-This project is licensed under the [Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0)
-- see the [LICENSE](LICENSE) file for details
+This project is licensed under the
+[Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) - see the [LICENSE](LICENSE) file for details
 
