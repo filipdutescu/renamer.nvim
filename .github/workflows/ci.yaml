@@ -23,13 +23,13 @@ jobs:
             url: 'https://github.com/neovim/neovim/releases/download/$latest_version/nvim-linux64.tar.gz'
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@latest
 
       - name: Get today's date
         run: date +%F > todays-date
 
       - name: Restore from today's cache
-        uses: actions/cache@v2
+        uses: actions/cache@latest
         with:
           path: ~/_neovim
           key: ${{ runner.os }}-${{ matrix.url }}-${{ hashFiles('todays-date') }}
@@ -68,9 +68,9 @@ jobs:
     name: Style linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@latest
 
-      - uses: JohnnyMorganz/stylua-action@1.0.0
+      - uses: JohnnyMorganz/stylua-action@latest
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --color always --check lua/
