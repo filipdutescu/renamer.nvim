@@ -97,7 +97,30 @@ vim.api.nvim_set_keymap('v', '<leader>rn', '<cmd>lua require("renamer").rename()
 
 ## Customization
 
+`renamer.nvim` offers different customization options, in order to change its
+appearance and behaviour. Below you will find the defaults and the structure
+of the settings table.
 
+### Renamer setup structure
+
+```lua
+require('renamer').setup {
+    title = 'Rename',
+    padding = { 0, 0, 0, 0 },
+    border = true,
+    border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    prefix = '',
+}
+```
+
+Colours can also be changed, in order to better fit your theme or taste. The
+following highlight groups can also be modified to theme the popup colours:
+
+```viml
+hi default link RenamerNormal Normal
+hi default link RenamerBorder RenamerNormal
+hi default link RenamerPrefix Identifier
+```
 
 ## Default mappings
 
