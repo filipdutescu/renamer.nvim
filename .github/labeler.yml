@@ -1,0 +1,17 @@
+ci:
+  - '.github/*'
+  - '.stylua.toml'
+
+build:
+  - 'Makefile'
+  - 'scripts/**/*'
+
+docs:
+  - 'doc/**/*'
+  - 'README*'
+  - 'LICENSE'
+  - 'CONTRIBUTING*'
+
+test:
+  - 'lua/tests/**/*'
+
