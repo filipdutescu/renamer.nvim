@@ -1,0 +1,12 @@
+build: 'build/*'
+chore: 'chore/*'
+ci: 'ci/*'
+docs: 'docs/*'
+feature: [ 'feature/*', 'feat/*' ]
+fix: 'fix/*'
+perf: 'perf/*'
+refactor: 'refactor/*'
+revert: 'revert/*'
+style: 'style/*'
+test: 'test/*'
+
