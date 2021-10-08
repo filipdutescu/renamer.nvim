@@ -5,11 +5,11 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0
 
-      - uses: wagoid/commitlint-github-action@latest
+      - uses: wagoid/commitlint-github-action@2.0.3
         with:
           failOnWarnings: true
 
