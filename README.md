@@ -21,14 +21,14 @@ LSP feature as its backend.
 ## Features
 
 - **Lightweight:** the overhead of this plugin is insignificant and it makes use
-of existent features or plugins you most likely already have installed (only
-[plenary.nvim](https://github.com/nvim-lua/plenary.nvim) required).
+  of existent features or plugins you most likely already have installed (only
+  [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) required).
 - **Responsive UI:** takes into account the cursor position and where the popup
-will be place relative to the current window to adjust the its placement.
+  will be place relative to the current window to adjust the its placement.
 - **[Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0) LSP**:
-uses the Neovim LSP to rename across scopes and project.
+  uses the Neovim LSP to rename across scopes and project.
 - **Popup customization**: provides several ways to integrate the popup with
-your specific setup, from border characters and title to its colours.
+  your specific setup, from border characters and title to its colours.
 
 ## Getting started
 
@@ -132,10 +132,12 @@ TODO - Should add media to showcase the plugin
 
 ## Contributing
 
-TODO - Should add a `Contributing` guide
+All contributions are welcome! Just open a pull request or an issue. Please read
+[CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
 This project is licensed under the
-[Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) - see the [LICENSE](LICENSE) file for details
+[Apache 2.0 License](https://www.apache.org/licenses/LICENSE-2.0) - see the
+[LICENSE](LICENSE) file for details
 
