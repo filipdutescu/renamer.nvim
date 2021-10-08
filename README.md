@@ -7,16 +7,27 @@
 Lua. It is considerably customizable and uses the [Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0)
 LSP feature as its backend.
 
+## Table of contents
+
+- [Features](#features)
+- [Getting started](#getting-started)
+- [Usage](#usage)
+- [Customization](#customization)
+- [Default mappings](#default-mappings)
+- [Media](#media)
+- [Contributing](#contributing)
+- [License](#license)
+
 ## Features
 
-* **Lightweight:** the overhead of this plugin is insignificant and it makes use
+- **Lightweight:** the overhead of this plugin is insignificant and it makes use
 of existent features or plugins you most likely already have installed (only
 [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) required).
-* **Responsive UI:** takes into account the cursor position and where the popup
+- **Responsive UI:** takes into account the cursor position and where the popup
 will be place relative to the current window to adjust the its placement.
-* **[Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0) LSP**:
+- **[Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0) LSP**:
 uses the Neovim LSP to rename across scopes and project.
-* **Popup customization**: provides several ways to integrate the popup with
+- **Popup customization**: provides several ways to integrate the popup with
 your specific setup, from border characters and title to its colours.
 
 ## Getting started
@@ -63,27 +74,43 @@ and how to configure it.
 
 ## Usage
 
-TODO
+To rename the current word using `renamer.nvim`, you need to call the `rename`
+method (`require('renamer).rename()`).
+
+The recommended way of doing it is by setting up keybindings to call the function:
+
+VimScript:
+
+```viml
+" Find files using Telescope command-line sugar.
+inoremap <silent> <F2> <cmd>lua require('renamer').rename()<cr>
+nnoremap <silent> <leader>rn <cmd>lua require('renamer').rename()<cr>
+vnoremap <silent> <leader>rn <cmd>lua require('renamer').rename()<cr>
+```
+
+Lua:
+
+```lua
+vim.api.nvim_set_keymap('i', '<F2>', '<cmd>lua require("renamer").rename()<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>rn', '<cmd>lua require("renamer").rename()<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', '<leader>rn', '<cmd>lua require("renamer").rename()<cr>', { noremap = true, silent = true })
+```
 
 ## Customization
 
-TODO
+
 
 ## Default mappings
 
-TODO
-
-## Autocmds
-
-TODO
+TODO - Should add mappings to make it easy to edit and select text in the prompt.
 
 ## Media
 
-TODO
+TODO - Should add media to showcase the plugin
 
 ## Contributing
 
-TODO
+TODO - Should add a `Contributing` guide
 
 ## License
 
