@@ -23,7 +23,7 @@ jobs:
             url: 'https://github.com/neovim/neovim/releases/download/$latest_version/nvim-linux64.tar.gz'
 
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v2
 
       - name: Get today's date
         run: date +%F > todays-date
@@ -68,9 +68,9 @@ jobs:
     name: Style linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@latest
+      - uses: actions/checkout@v2
 
-      - uses: JohnnyMorganz/stylua-action@latest
+      - uses: JohnnyMorganz/stylua-action@1.0.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --color always --check lua/
