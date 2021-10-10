@@ -68,6 +68,11 @@ use {
 }
 ```
 
+### Verify your installation
+
+After those steps, you should be able to run `:checkhealth renamer` in order to
+see if anything is missing from your setup.
+
 After following the steps above, either continue reading below or run `:help
 renamer` to get an understanding of the next steps required to use `renamer.nvim`
 and how to configure it.
