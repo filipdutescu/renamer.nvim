@@ -4,6 +4,7 @@ ci: 'ci/*'
 docs: 'docs/*'
 feature: [ 'feature/*', 'feat/*' ]
 fix: 'fix/*'
+hotfix: 'hotfix/*'
 perf: 'perf/*'
 refactor: 'refactor/*'
 revert: 'revert/*'

@@ -15,6 +15,7 @@ jobs:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
 
       - uses: TimonVS/pr-labeler-action@v3
+        name: Label based on head branch name
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
 
