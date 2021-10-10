@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   release:
@@ -13,13 +13,14 @@ jobs:
         id: changelog
         uses: TriPSs/conventional-changelog-action@v3
         with:
+          git-message: 'chore(release): {version}'
           github-token: ${{ secrets.github_token }}
           release-count: 0
           skip-version-file: true
 
       - name: Create Release
         uses: actions/create-release@v1
-        if: ${{ steps.changelog.outputs.skipped == 'false' }}
+        if: ${{ steps.changelog.outputs.skipped == 'true' }}
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
         with:
