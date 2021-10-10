@@ -1,8 +1,6 @@
 name: Pull Request Labeler
 
 on:
-  push:
-    branches: [ master, develop, release/** ]
   pull_request_target:
     branches: [ master, develop, release/** ]
 
