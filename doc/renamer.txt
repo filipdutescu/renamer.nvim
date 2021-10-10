@@ -1,0 +1,87 @@
+================================================================================
+                                                                  *renamer.nvim*
+
+Renamer.nvim is a plugin for a Visual-Studio-Code-like user interface for
+renaming in neovim. It provides several ways to configure its aspect and uses
+the LSP API to rename the current word under the cursor.
+
+Getting started with renamer:
+  1. Run `:checkhealth renamer` to make sure everything is installed.
+  2. Put a `require("renamer").setup()` call somewhere in your neovim config.
+  3. Read |renamer.setup| to check what config keys are available and what
+     you can put inside the setup call
+  4. Evalulate it working with `:lua require("renamer").rename()`
+
+To find out more:
+https://github.com/filipdutescu/renamer.nvim
+
+  :h renamer.setup
+  :h renamer.rename
+
+
+
+===============================================================================
+                                                              *renamer.setup()*
+
+renamer.setup({opts}) 
+    Setup function to be run by the user. Configures the aspect of the renamer
+    user interface. Used to change things such as the title or border of the
+    popup.
+
+    Usage:
+    >
+    require('renamer').setup {
+        title = 'Rename',
+        padding = { 0, 0, 0, 0 },
+        border = true,
+        border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+        prefix = '',
+    }
+<
+
+
+    Parameters: ~
+        {opts} (table)  options to pass to the setup function
+
+    Fields: ~
+        {title}         (string)    title of the popup, shown on the top border
+                                    (default: 'Rename')
+        {padding}       (list)      list of integer values that define the
+                                    padding of the popup, as such:
+                                    above/right/below/left
+                                    (default: { 0, 0, 0, 0 })
+        {border}        (boolean)   defines whether or not to draw the border
+                                    (default: true)
+        {border_chars}  (list)      list of characters to use for the border,
+                                    with the possible values being:
+                                    - 1 character to use all around, e.g. '*'
+                                    - border/corners
+                                    - top/right/bottom/left
+                                    - top/right/bottom/left, followed by
+                                      topleft/topright/botright/botleft
+                                    (default: { '─', '│', '─', '│',
+                                    '╭', '╮', '╯', '╰' })
+        {prefix}        (string)    the character to be used as a prompt
+                                    prefix (default: '', meaning the popup is
+                                    not defined as a prompt)
+
+
+
+
+===============================================================================
+                                                             *renamer.rename()*
+
+renamer.rename()
+   Function that renames the word under the cursor, using Neovim's built in
+   LSP feature (see |vim.lsp.buf.rename()|). Creates a popup next to the
+   cursor, starting at the beginning of the word.
+
+   The popup is drawn below the current line, if there is enough space,
+   otherwise on the one above it.
+
+   Usage:
+   >
+   require('renamer').rename()
+<
+
+vim:tw=78:ts=8:ft=help:norl:
