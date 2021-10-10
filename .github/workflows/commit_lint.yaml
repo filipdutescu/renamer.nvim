@@ -1,5 +1,10 @@
 name: Lint Commit Messages
-on: [ push, pull_request ]
+
+on:
+  push:
+    branches: [ master, develop, release/** ]
+  pull_request:
+    branches: [ master, develop, release/** ]
 
 jobs:
   commitlint:
