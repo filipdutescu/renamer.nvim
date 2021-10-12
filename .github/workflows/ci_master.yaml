@@ -1,10 +1,10 @@
-name: Build
+name: Build (master)
 
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ master ]
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ master ]
 
 jobs:
   unit_tests:

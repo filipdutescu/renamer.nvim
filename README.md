@@ -1,4 +1,5 @@
-[![Actions Status](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml/badge.svg)](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml)
+[![Build (master)](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci_master.yaml/badge.svg)](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci_master.yaml)
+[![Build](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml/badge.svg)](https://github.com/filipdutescu/renamer.nvim/actions/workflows/ci.yaml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/filipdutescu/renamer.nvim)](https://github.com/filipdutescu/renamer.nvim/releases)
 
 # renamer.nvim
