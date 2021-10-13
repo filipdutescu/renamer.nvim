@@ -5,8 +5,36 @@ local log = require('plenary.log').new {
 local popup = require 'plenary.popup'
 local utils = require 'renamer.utils'
 
+--- @class Renamer
+--- @field public title string
+--- @field public padding integer[]
+--- @field public border boolean
+--- @field public border_chars string[]
+--- @field public prefix string
+--- @field private _buffers table
 local renamer = {}
 
+--- Setup function to be run by the user. Configures the aspect of the renamer
+--- user interface. Used to change things such as the title or border of the
+--- popup.
+---
+--- Usage:
+--- <code>
+--- require('renamer').setup {
+---     -- The popup title, shown if `border` is true
+---     title = 'Rename',
+---     -- The padding around the popup content
+---     padding = { 0, 0, 0, 0 },
+---     -- Whether or not to shown a border around the popup
+---     border = true,
+---     -- The characters which make up the border
+---     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+---     -- The string to be used as a prompt prefix. It also sets the buffer to
+---     -- be a prompt
+---     prefix = '',
+--- }
+--- </code>
+--- @param opts Defaults Configuration options, see `renamer.defaults`.
 function renamer.setup(opts)
     opts = opts or {}
 
@@ -21,6 +49,19 @@ function renamer.setup(opts)
     renamer._buffers = {}
 end
 
+--- Function that renames the word under the cursor, using Neovim's built in
+--- LSP feature (`vim.lsp.buf.rename()`). Creates a popup next to the cursor,
+--- starting at the beginning of the word.
+---
+--- The popup is drawn below the current line, if there is enough space,
+--- otherwise on the one above it.
+---
+--- Usage:
+--- <code>
+--- require('renamer').rename()
+--- </code>
+--- @return integer prompt_window_id
+--- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename()
     local cword = vim.fn.expand '<cword>'
     local line, col = renamer._get_cursor()
@@ -210,9 +251,7 @@ function renamer._delete_autocmds()
     vim.cmd [[augroup end]]
 end
 
--- [[
 -- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
--- ]]
 function renamer._lsp_rename(word)
     vim.lsp.buf.rename(word)
 end

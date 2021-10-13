@@ -4,6 +4,8 @@ local required_plugins = {
     { name = 'plenary' },
 }
 
+--- @class Health
+--- @field public report table Has the reporting functions (e.g. ok, error)
 local health = {}
 health.report = {
     start = vim.fn['health#report_start'],
@@ -18,6 +20,13 @@ health._is_plugin_installed = function(plugin_name)
     return res
 end
 
+--- Checks if all of the required dependecies are installed and if the
+--- `renamer.setup` function was called to initialize the plugin.
+---
+--- Usage:
+--- <code>
+--- require('renamer.health').check()
+--- </code>
 health.check = function()
     health.report.start 'Checking required plugins...'
 

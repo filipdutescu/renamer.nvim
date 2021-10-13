@@ -1,3 +1,9 @@
+--- @class Defaults
+--- @field public title string
+--- @field public padding integer[]
+--- @field public border boolean
+--- @field public border_chars string[]
+--- @field public prefix string
 local defaults = {
     -- The popup title, shown if `border` is true
     title = 'Rename',
