@@ -110,6 +110,7 @@ of the settings table.
 ### Renamer setup structure
 
 ```lua
+local mappings_utils = require('renamer.mappings.utils')
 require('renamer').setup {
     -- The popup title, shown if `border` is true
     title = 'Rename',
@@ -119,8 +120,20 @@ require('renamer').setup {
     border = true,
     -- The characters which make up the border
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-    -- The string to be used as a prompt prefix. It also sets the buffer to be a prompt
+    -- The string to be used as a prompt prefix. It also sets the buffer to
+    -- be a prompt
     prefix = '',
+    -- The keymaps available while in the `renamer` buffer. The example below
+    -- overrides the default values, but you can add others as well.
+    mappings = {
+        ['<c-i>'] = mappings_utils.set_cursor_to_start,
+        ['<c-a>'] = mappings_utils.set_cursor_to_end,
+        ['<c-e>'] = mappings_utils.set_cursor_to_word_end,
+        ['<c-b>'] = mappings_utils.set_cursor_to_word_start,
+        ['<c-c>'] = mappings_utils.clear_line,
+        ['<c-u>'] = mappings_utils.undo,
+        ['<c-r>'] = mappings_utils.redo,
+    },
 }
 ```
 
@@ -135,7 +148,19 @@ hi default link RenamerPrefix Identifier
 
 ## Default mappings
 
-TODO - Should add mappings to make it easy to edit and select text in the prompt.
+Mappings are fully customizable. The default mappings are intended to be familiar
+to users and mimic the default behaviour of their normal mode equivalents.
+
+| Mappings | Action                       |
+|----------|------------------------------|
+| `<c-i>`  | Go to the start of the line. |
+| `<c-a>`  | Go to the end of the line.   |
+| `<c-e>`  | Go to the end of the word.   |
+| `<c-b>`  | Go to the start of the word. |
+| `<c-c>`  | Clear the buffer line.       |
+| `<c-u>`  | Undo changes.                |
+| `<c-r>`  | Redo undone changes.         |
+
 
 ## Media
 

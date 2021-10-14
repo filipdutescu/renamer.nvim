@@ -4,6 +4,7 @@ local log = require('plenary.log').new {
 }
 local popup = require 'plenary.popup'
 local utils = require 'renamer.utils'
+local mappings = require 'renamer.mappings'
 
 --- @class Renamer
 --- @field public title string
@@ -32,6 +33,17 @@ local renamer = {}
 ---     -- The string to be used as a prompt prefix. It also sets the buffer to
 ---     -- be a prompt
 ---     prefix = '',
+---     -- The keymaps available while in the `renamer` buffer. The example below
+---     -- overrides the default values, but you can add others as well.
+---     mappings = {
+---         ['<c-i>'] = require('renamer.mappings.utils').set_cursor_to_start,
+---         ['<c-a>'] = require('renamer.mappings.utils').set_cursor_to_end,
+---         ['<c-e>'] = require('renamer.mappings.utils').set_cursor_to_word_end,
+---         ['<c-b>'] = require('renamer.mappings.utils').set_cursor_to_word_start,
+---         ['<c-c>'] = require('renamer.mappings.utils').clear_line,
+---         ['<c-u>'] = require('renamer.mappings.utils').undo,
+---         ['<c-r>'] = require('renamer.mappings.utils').redo,
+---     },
 --- }
 --- </code>
 --- @param opts Defaults Configuration options, see `renamer.defaults`.
@@ -45,8 +57,10 @@ function renamer.setup(opts)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.prefix = utils.get_value_or_default(opts, 'prefix', defaults.prefix)
+    mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
 
     renamer._buffers = {}
+    log.info 'Finished setup.'
 end
 
 --- Function that renames the word under the cursor, using Neovim's built in
@@ -101,8 +115,12 @@ function renamer.rename()
         opts = popup_opts,
         border_opts = prompt_opts.border,
     }
+    log.fmt_info('Created "plenary" popup, with options: %s', vim.inspect(renamer._buffers[prompt_win_id]))
+
     renamer._setup_window(prompt_win_id)
+    log.trace 'Finished setting up the popup.'
     renamer._set_prompt_win_style(prompt_win_id)
+    log.trace 'Finished styling the popup.'
 
     return prompt_win_id, renamer._buffers[prompt_win_id]
 end
@@ -111,6 +129,8 @@ function renamer.on_submit(window_id)
     if window_id and renamer._buffers and renamer._buffers[window_id] then
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
+
+        log.fmt_info('Submitted word: "%s".', new_word)
 
         renamer._delete_autocmds()
         local initial_mode = renamer._buffers[window_id].opts and renamer._buffers[window_id].opts.initial_mode
@@ -152,7 +172,9 @@ function renamer.on_close(window_id)
     local opts = renamer._buffers and renamer._buffers[window_id]
     local border_win_id = opts and opts.border_opts and opts.border_opts.win_id
     delete_window(window_id)
+    log.fmt_info('Deleted window: "%s".', window_id)
     delete_window(border_win_id)
+    log.fmt_info('Deleted window: "%s" (border).', border_win_id)
 end
 
 function renamer._get_cursor()
@@ -199,6 +221,14 @@ function renamer._setup_window(prompt_win_id)
         "<cmd>lua require('renamer').on_submit(" .. prompt_win_id .. ')<cr>',
         { noremap = true }
     )
+    vim.api.nvim_buf_set_keymap(
+        prompt_buf_id,
+        'i',
+        '<esc>',
+        "<cmd>lua require('renamer').on_close(" .. prompt_win_id .. ')<cr>',
+        { noremap = true }
+    )
+    mappings.register_bindings(prompt_buf_id)
 end
 
 function renamer._set_prompt_win_style(prompt_win_id)
@@ -236,7 +266,7 @@ end
 
 function renamer._create_autocmds(prompt_win_id)
     local on_leave = string.format(
-        [[  autocmd BufLeave,WinLeave,InsertLeave <buffer> ++nested ++once :silent lua require'renamer'.on_close(%s)]],
+        [[  autocmd BufLeave,WinLeave <buffer> ++nested ++once :silent lua require'renamer'.on_close(%s)]],
         prompt_win_id
     )
     vim.cmd [[augroup RenamerInsert]]

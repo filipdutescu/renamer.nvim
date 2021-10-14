@@ -115,5 +115,22 @@ describe('renamer', function()
             eq(expected_border_opts, opts.border_opts)
             mock.revert(api_mock)
         end)
+
+        it('should call `mappings.register_bindings`', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_get_mode.returns {}
+            local mappings = require 'renamer.mappings'
+            local register_bindings = spy.on(mappings, 'register_bindings')
+            stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            stub(popup, 'create').returns(1, {})
+
+            renamer.rename()
+
+            assert.spy(register_bindings).was_called()
+            mock.revert(api_mock)
+        end)
     end)
 end)

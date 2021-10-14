@@ -17,6 +17,7 @@ https://github.com/filipdutescu/renamer.nvim
 
   :h renamer.setup
   :h renamer.rename
+  :h renamer.mappings
 
 
 
@@ -30,6 +31,7 @@ renamer.setup({opts})
 
     Usage:
     >
+    local mappings_utils = require('renamer.mappings.utils')
     require('renamer').setup {
         -- The popup title, shown if `border` is true
         title = 'Rename',
@@ -39,8 +41,20 @@ renamer.setup({opts})
         border = true,
         -- The characters which make up the border
         border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
-        -- The string to be used as a prompt prefix. It also sets the buffer to be a prompt
+        -- The string to be used as a prompt prefix. It also sets the buffer to
+        -- be a prompt
         prefix = '',
+        -- The keymaps available while in the `renamer` buffer. The example below
+        -- overrides the default values, but you can add others as well.
+        mappings = {
+            ['<c-i>'] = mappings_utils.set_cursor_to_start,
+            ['<c-a>'] = mappings_utils.set_cursor_to_end,
+            ['<c-e>'] = mappings_utils.set_cursor_to_word_end,
+            ['<c-b>'] = mappings_utils.set_cursor_to_word_start,
+            ['<c-c>'] = mappings_utils.clear_line,
+            ['<c-u>'] = mappings_utils.undo,
+            ['<c-r>'] = mappings_utils.redo,
+        },
     }
 <
 
@@ -69,6 +83,10 @@ renamer.setup({opts})
         {prefix}        (string)    the character to be used as a prompt
                                     prefix (default: '', meaning the popup is
                                     not defined as a prompt)
+        {mappings}      (table)     the keymaps that should be available in
+                                    the buffer, alongside their respective
+                                    actions (default: see
+                                    |lua/renamer/mappings/init.lua|)
 
 
 
@@ -87,6 +105,62 @@ renamer.rename()
    Usage:
    >
    require('renamer').rename()
-<
+
+
+
+
+===============================================================================
+                                                             *renamer.mappings*
+
+Mappings are different key combinations used to help you navigate the `renamer`
+buffer window. The following are mapped by default and can be overriden as
+described in |renamer.setup|:
+
+                                                                        *<c-i>*
+<c-i>               Go to the start of the line (or buffer, since it only
+                    contains one line). Behind the scenes, it uses the "I"
+                    normal mode keymap.
+
+                        See `:help I`
+
+                                                                        *<c-a>*
+<c-a>               Go to the end of the line (or buffer, since it only
+                    contains one line). Behind the scenes, it uses the "A"
+                    normal mode keymap.
+
+                        See `:help A`
+
+                                                                        *<c-e>*
+<c-e>               Go to the end of the word currently under the cursor.
+                    Behind the scenes, it uses the "e" normal mode keymap.
+
+                        See `:help e`
+
+                                                                        *<c-b>*
+<c-b>               Go to the beginning of the word currently under the
+                    cursor. Behind the scenes, it uses the "b" normal mode
+                    keymap.
+
+                        See `:help b`
+
+                                                                        *<c-c>*
+<c-c>               Clears the line (or buffer, since it only contains one
+                    line). Behind the scenes, it uses the "0C" normal mode
+                    keymaps.
+
+                        See `:help 0`, `:help C`
+
+                                                                        *<c-u>*
+<c-u>               Undo changes. Behind the scenes, it uses the "u" normal
+                    mode keymap.
+
+                        See `:help u`
+
+                                                                        *<c-r>*
+<c-r>               Redo changes that were undone. Behind the scenes, it uses
+                    the "<c-r>" normal mode keymap.
+
+                        See ``:help CTRL-R`
+
 
 vim:tw=78:ts=8:ft=help:norl:
