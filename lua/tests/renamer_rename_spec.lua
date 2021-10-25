@@ -24,12 +24,14 @@ describe('renamer', function()
             api_mock.nvim_get_mode.returns {}
             stub(vim.fn, 'expand').returns 'test'
             local get_word_boundaries_in_line = stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(1, {})
 
             renamer.rename()
 
             assert.spy(get_word_boundaries_in_line).was_called_with(expected_line, expected_cword, expected_col)
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
 
         it('should call `_setup_window`', function()
@@ -40,12 +42,14 @@ describe('renamer', function()
             api_mock.nvim_get_mode.returns {}
             local setup_window = spy.on(renamer, '_setup_window')
             stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(1, {})
 
             renamer.rename()
 
             assert.spy(setup_window).was_called()
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
 
         it('should call `_set_prompt_win_style`', function()
@@ -56,12 +60,14 @@ describe('renamer', function()
             api_mock.nvim_get_mode.returns {}
             local set_prompt_win_style = spy.on(renamer, '_set_prompt_win_style')
             stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(1, {})
 
             renamer.rename()
 
             assert.spy(set_prompt_win_style).was_called()
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
 
         it('should call `_create_autocmds`', function()
@@ -72,12 +78,14 @@ describe('renamer', function()
             api_mock.nvim_get_mode.returns {}
             local create_autocms = spy.on(renamer, '_create_autocmds')
             stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(1, {})
 
             renamer.rename()
 
             assert.spy(create_autocms).was_called()
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
 
         it('should return the buffer ID and the popup options', function()
@@ -106,6 +114,7 @@ describe('renamer', function()
             api_mock.nvim_buf_line_count.returns(expected_line_no + 5)
             api_mock.nvim_get_mode.returns { mode = expected_opts.initial_mode }
             stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(expected_buf_id, { border = expected_border_opts })
 
             local buf_id, opts = renamer.rename()
@@ -114,6 +123,7 @@ describe('renamer', function()
             eq(expected_opts, opts.opts)
             eq(expected_border_opts, opts.border_opts)
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
 
         it('should call `mappings.register_bindings`', function()
@@ -125,12 +135,14 @@ describe('renamer', function()
             local mappings = require 'renamer.mappings'
             local register_bindings = spy.on(mappings, 'register_bindings')
             stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight').returns()
             stub(popup, 'create').returns(1, {})
 
             renamer.rename()
 
             assert.spy(register_bindings).was_called()
             mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
         end)
     end)
 end)

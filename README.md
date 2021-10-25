@@ -146,6 +146,13 @@ hi default link RenamerBorder RenamerNormal
 hi default link RenamerPrefix Identifier
 ```
 
+`renamer.nvim` also **highlights the current text** wherever it is used in the
+current document, using `vim.lsp.buf.document_highlight()`. In order for it to
+be visible, the `LspReferenceText`, `LspReferenceRead` and `LspReferenceWrite`
+highlight groups need to be defined (see the
+[`vim.lsp.buf.document_highlight()`](https://neovim.io/doc/user/lsp.html#vim.lsp.buf.document_highlight())
+ documentation for details).
+
 ## Default mappings
 
 Mappings are fully customizable. The default mappings are intended to be familiar

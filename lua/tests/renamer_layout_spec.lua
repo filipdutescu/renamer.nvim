@@ -23,12 +23,14 @@ describe('renamer', function()
                 api_mock.nvim_get_mode.returns {}
                 local set_prompt_border_win_style = spy.on(renamer, '_set_prompt_border_win_style')
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, { border = { win_id = 1 } })
 
                 renamer.rename()
 
                 assert.spy(set_prompt_border_win_style).was_called_with(1)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should use cursor line for line position if there is enough space below', function()
@@ -41,12 +43,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should use flip line position if at the end of the screen', function()
@@ -58,12 +62,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column inside word)', function()
@@ -75,12 +81,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column at word start)', function()
@@ -93,12 +101,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column at word end)', function()
@@ -112,12 +122,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
         end)
 
@@ -136,12 +148,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should use flip line position if at the end of the screen', function()
@@ -153,12 +167,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column inside word)', function()
@@ -170,12 +186,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no + 1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column at word start)', function()
@@ -188,12 +206,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col + 1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
 
             it('should set the column position at the begining of the cword (cursor column at word end)', function()
@@ -207,12 +227,14 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
                 local _, opts = renamer.rename()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
             end)
         end)
     end)

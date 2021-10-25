@@ -94,6 +94,8 @@ function renamer.rename()
         prompt_line_no = -prompt_line_no
     end
 
+    renamer._document_highlight()
+
     local popup_opts = {
         title = renamer.title,
         padding = renamer.padding,
@@ -175,6 +177,7 @@ function renamer.on_close(window_id)
     log.fmt_info('Deleted window: "%s".', window_id)
     delete_window(border_win_id)
     log.fmt_info('Deleted window: "%s" (border).', border_win_id)
+    renamer._clear_references()
 end
 
 function renamer._get_cursor()
@@ -284,6 +287,16 @@ end
 -- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
 function renamer._lsp_rename(word)
     vim.lsp.buf.rename(word)
+end
+
+-- Since there is no way to mock `vim.lsp.buf.document_highlight`, this function is used as a replacement.
+function renamer._document_highlight()
+    vim.lsp.buf.document_highlight()
+end
+
+-- Since there is no way to mock `vim.lsp.buf.clear_references`, this function is used as a replacement.
+function renamer._clear_references()
+    vim.lsp.buf.clear_references()
 end
 
 return renamer
