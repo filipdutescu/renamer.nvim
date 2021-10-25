@@ -1,4 +1,15 @@
-# 0.1.0 (2021-10-10)
+# [0.2.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.1.0...v0.2.0) (2021-10-25)
+
+
+### Features
+
+* **health:** add healthcheck ([d3de848](https://github.com/filipdutescu/renamer.nvim/commit/d3de84826aa4c8c2a39745e5976d71ebecea3f2b)), closes [#8](https://github.com/filipdutescu/renamer.nvim/issues/8)
+* highlight the word to be renamed ([f6eff46](https://github.com/filipdutescu/renamer.nvim/commit/f6eff46fa1529a4323d0cc048744a0b5bd912f97)), closes [#28](https://github.com/filipdutescu/renamer.nvim/issues/28)
+* **keymaps:** add mappings for easier navigation ([8d0b299](https://github.com/filipdutescu/renamer.nvim/commit/8d0b2991d8b78c1c6ce46b589be79b68cda37341)), closes [#3](https://github.com/filipdutescu/renamer.nvim/issues/3)
+
+
+
+# [0.1.0](https://github.com/filipdutescu/renamer.nvim/compare/43853a17491d05aaf6b8f93ad9a838ef7fb523f0...v0.1.0) (2021-10-10)
 
 
 ### Bug Fixes
