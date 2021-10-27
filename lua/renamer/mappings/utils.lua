@@ -26,7 +26,7 @@ utils.set_cursor_to_word_start = function()
 end
 
 utils.clear_line = function()
-    utils.exec_in_normal(vim.api.nvim_feedkeys, { keep_insert = true }, '0C', 'n', true)
+    utils.exec_in_normal(vim.api.nvim_feedkeys, {}, '0C', 'n', true)
 end
 
 utils.undo = function()
