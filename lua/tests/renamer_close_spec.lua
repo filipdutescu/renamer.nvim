@@ -116,66 +116,6 @@ describe('renamer', function()
             on_close.revert(on_close)
             lsp_rename.revert(lsp_rename)
         end)
-
-        it('should stay in insert mode if opened in it', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns {}
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'i' } }
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(api_mock.nvim_command).called_less_than(1)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            lsp_rename.revert(lsp_rename)
-        end)
-
-        it('should exit insert mode if not opened in it (initial mode is `normal`)', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns {}
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'n' } }
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(api_mock.nvim_command).was_called_with [[stopinsert]]
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            lsp_rename.revert(lsp_rename)
-        end)
-
-        it('should exit insert mode if not opened in it (initial mode is `visual`)', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns {}
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'v' } }
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(api_mock.nvim_command).was_called_with [[stopinsert]]
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            lsp_rename.revert(lsp_rename)
-        end)
     end)
 
     describe('on_close', function()
@@ -379,6 +319,49 @@ describe('renamer', function()
             renamer.on_close(expected_win_id)
 
             assert.spy(clear_references).was_called()
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
+
+        it('should stay in insert mode if opened in it', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            local clear_references = stub(renamer, '_clear_references').returns()
+            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'i' } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(api_mock.nvim_command).called_less_than(1)
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
+
+        it('should exit insert mode if not opened in it (initial mode is `normal`)', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            local clear_references = stub(renamer, '_clear_references').returns()
+            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'n' } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(api_mock.nvim_command).was_called_with [[stopinsert]]
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
+
+        it('should exit insert mode if not opened in it (initial mode is `visual`)', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            api_mock.nvim_command.returns()
+            local clear_references = stub(renamer, '_clear_references').returns()
+            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'v' } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(api_mock.nvim_command).was_called_with [[stopinsert]]
             mock.revert(api_mock)
             clear_references.revert(clear_references)
         end)

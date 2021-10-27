@@ -131,16 +131,10 @@ function renamer.on_submit(window_id)
     if window_id and renamer._buffers and renamer._buffers[window_id] then
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
-
         log.fmt_info('Submitted word: "%s".', new_word)
 
         renamer._delete_autocmds()
-        local initial_mode = renamer._buffers[window_id].opts and renamer._buffers[window_id].opts.initial_mode
-        if initial_mode and not string.match(initial_mode, 'i') then
-            vim.api.nvim_command [[stopinsert]]
-        end
         renamer.on_close(window_id)
-
         renamer._lsp_rename(new_word)
     end
 end
@@ -171,13 +165,19 @@ function renamer.on_close(window_id)
         end
     end
 
-    local opts = renamer._buffers and renamer._buffers[window_id]
-    local border_win_id = opts and opts.border_opts and opts.border_opts.win_id
+    local settings = renamer._buffers and renamer._buffers[window_id]
+    local border_win_id = settings and settings.border_opts and settings.border_opts.win_id
+    local initial_mode = settings and settings.opts and settings.opts.initial_mode
+
     delete_window(window_id)
     log.fmt_info('Deleted window: "%s".', window_id)
     delete_window(border_win_id)
     log.fmt_info('Deleted window: "%s" (border).', border_win_id)
+
     renamer._clear_references()
+    if initial_mode and not string.match(initial_mode, 'i') then
+        vim.api.nvim_command [[stopinsert]]
+    end
 end
 
 function renamer._get_cursor()
