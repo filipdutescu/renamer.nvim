@@ -87,7 +87,7 @@ describe('renamer', function()
 
             renamer.on_submit(expected_win_id)
 
-            assert.spy(renamer.on_close).was_called_with(expected_win_id)
+            assert.spy(renamer.on_close).was_called_with(expected_win_id, false)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
             mock.revert(api_mock)
@@ -104,17 +104,47 @@ describe('renamer', function()
             api_mock.nvim_command.returns()
             local on_close = stub(renamer, 'on_close').returns()
             local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = {}
+            local expected_pos = { word_start = 1, line = 1, col = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_pos = expected_pos } }
 
             renamer.on_submit(expected_win_id)
 
-            assert.spy(lsp_rename).was_called_with(expected_content)
-            assert.spy(on_close).was_called_with(expected_win_id)
+            assert.spy(lsp_rename).was_called_with(expected_content, expected_pos)
+            assert.spy(on_close).was_called_with(expected_win_id, false)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
             mock.revert(api_mock)
             on_close.revert(on_close)
             lsp_rename.revert(lsp_rename)
+        end)
+
+        it('should set cursor after the end of the new word', function()
+            local expected_win_id, expected_buf_id = 123, 321
+            local expected_content = 'test'
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_buf.returns(expected_buf_id)
+            api_mock.nvim_buf_get_lines.returns { expected_content }
+            api_mock.nvim_command.returns()
+            api_mock.nvim_win_set_cursor.returns()
+            local on_close = stub(renamer, 'on_close').returns()
+            local expected_pos = { word_start = 1, line = 1, col = 1 }
+            local expected_params = {}
+            local make_params = stub(renamer, '_make_position_params').returns(expected_params)
+            local buf_request = stub(renamer, '_buf_request').invokes(function()
+                api_mock.nvim_win_set_cursor(0, { expected_pos.line, expected_pos.col })
+            end)
+            renamer._buffers[expected_win_id] = { opts = { initial_pos = expected_pos } }
+
+            renamer.on_submit(expected_win_id)
+
+            assert.spy(buf_request).was_called()
+            assert.spy(on_close).was_called_with(expected_win_id, false)
+            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
+            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
+            mock.revert(api_mock)
+            buf_request.revert(buf_request)
+            on_close.revert(on_close)
+            make_params.revert(make_params)
         end)
     end)
 
@@ -362,6 +392,23 @@ describe('renamer', function()
             renamer.on_close(expected_win_id)
 
             assert.spy(api_mock.nvim_command).was_called_with [[stopinsert]]
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
+
+        it('should set cursor in the initial position (when `rename()` is cancelled)', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            api_mock.nvim_command.returns()
+            api_mock.nvim_win_set_cursor.returns()
+            local clear_references = stub(renamer, '_clear_references').returns()
+            local expected_pos = { col = 1, line = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_pos = expected_pos } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_pos.line, expected_pos.col + 1 })
             mock.revert(api_mock)
             clear_references.revert(clear_references)
         end)

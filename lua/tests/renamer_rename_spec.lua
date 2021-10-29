@@ -89,8 +89,8 @@ describe('renamer', function()
         end)
 
         it('should return the buffer ID and the popup options', function()
-            local expected_col_no = 2
-            local expected_line_no = 2
+            local expected_col_no, expected_line_no = 2, 2
+            local word_start = 1
             local expected_opts = {
                 title = renamer.title,
                 padding = renamer.padding,
@@ -105,11 +105,16 @@ describe('renamer', function()
                 cursor_line = true,
                 enter = true,
                 initial_mode = 'test',
+                initial_pos = {
+                    word_start = word_start,
+                    col = expected_col_no,
+                    line = expected_line_no,
+                },
             }
             local expected_border_opts = {}
             local expected_buf_id = 123
             local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_cursor.returns { 1, expected_col_no }
+            api_mock.nvim_win_get_cursor.returns { expected_line_no, expected_col_no }
             api_mock.nvim_command.returns()
             api_mock.nvim_buf_line_count.returns(expected_line_no + 5)
             api_mock.nvim_get_mode.returns { mode = expected_opts.initial_mode }

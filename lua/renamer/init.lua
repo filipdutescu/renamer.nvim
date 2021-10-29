@@ -2,6 +2,7 @@ local log = require('plenary.log').new {
     plugin = 'renamer',
     level = 'warn',
 }
+local lsp_utils = require 'vim.lsp.util'
 local popup = require 'plenary.popup'
 local utils = require 'renamer.utils'
 local mappings = require 'renamer.mappings'
@@ -110,6 +111,11 @@ function renamer.rename()
         cursor_line = true,
         enter = true,
         initial_mode = vim.api.nvim_get_mode().mode,
+        initial_pos = {
+            word_start = word_start,
+            col = col,
+            line = line,
+        },
     }
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
 
@@ -129,54 +135,39 @@ end
 
 function renamer.on_submit(window_id)
     if window_id and renamer._buffers and renamer._buffers[window_id] then
+        local opts = renamer._buffers[window_id].opts
+        local pos = opts and opts.initial_pos
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
         log.fmt_info('Submitted word: "%s".', new_word)
 
         renamer._delete_autocmds()
-        renamer.on_close(window_id)
-        renamer._lsp_rename(new_word)
+        renamer.on_close(window_id, false)
+        renamer._lsp_rename(new_word, pos)
     end
 end
 
-function renamer.on_close(window_id)
-    local delete_window = function(win_id)
-        if win_id and vim.api.nvim_win_is_valid(win_id) then
-            local buf_id = vim.api.nvim_win_get_buf(win_id)
-            if
-                buf_id
-                and vim.api.nvim_buf_is_valid(buf_id)
-                and not vim.api.nvim_buf_get_option(buf_id, 'buflisted')
-            then
-                vim.api.nvim_command(string.format('silent! bdelete! %s', buf_id))
-            end
-
-            if vim.api.nvim_win_is_valid(win_id) then
-                vim.api.nvim_win_close(win_id, true)
-                if not pcall(vim.api.nvim_win_close, win_id, true) then
-                    log.trace('Failed to close window: rename_prompt_win/' .. win_id)
-                end
-            end
-        end
-
-        if win_id and renamer._buffers and renamer._buffers[win_id] then
-            renamer._buffers[win_id] = nil
-            renamer._delete_autocmds()
-        end
+function renamer.on_close(window_id, should_set_cursor_pos)
+    if should_set_cursor_pos == nil then
+        should_set_cursor_pos = true
     end
-
     local settings = renamer._buffers and renamer._buffers[window_id]
     local border_win_id = settings and settings.border_opts and settings.border_opts.win_id
     local initial_mode = settings and settings.opts and settings.opts.initial_mode
+    local pos = settings and settings.opts and settings.opts.initial_pos
 
-    delete_window(window_id)
+    renamer._delete_window(window_id)
     log.fmt_info('Deleted window: "%s".', window_id)
-    delete_window(border_win_id)
+    renamer._delete_window(border_win_id)
     log.fmt_info('Deleted window: "%s" (border).', border_win_id)
 
     renamer._clear_references()
     if initial_mode and not string.match(initial_mode, 'i') then
         vim.api.nvim_command [[stopinsert]]
+    end
+
+    if should_set_cursor_pos and pos then
+        vim.api.nvim_win_set_cursor(0, { pos.line, pos.col + 1 })
     end
 end
 
@@ -285,8 +276,35 @@ function renamer._delete_autocmds()
 end
 
 -- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
-function renamer._lsp_rename(word)
-    vim.lsp.buf.rename(word)
+function renamer._lsp_rename(word, pos)
+    local params = renamer._make_position_params()
+
+    renamer._buf_request(0, 'textDocument/prepareRename', params, function(prep_err, prep_resp)
+        if prep_err == nil and prep_resp == nil then
+            log.warn 'Nothing to rename.'
+            return
+        end
+        params.newName = word
+
+        renamer._buf_request(0, 'textDocument/rename', params, function(err, resp)
+            if err then
+                log.error(err)
+                return
+            end
+
+            if not resp then
+                log.warn 'LSP response is nil.'
+                return
+            end
+
+            lsp_utils.apply_workspace_edit(resp)
+
+            if pos then
+                local col = pos.word_start + #word - 1
+                vim.api.nvim_win_set_cursor(0, { pos.line, col })
+            end
+        end)
+    end)
 end
 
 -- Since there is no way to mock `vim.lsp.buf.document_highlight`, this function is used as a replacement.
@@ -294,9 +312,40 @@ function renamer._document_highlight()
     vim.lsp.buf.document_highlight()
 end
 
+function renamer._delete_window(win_id)
+    if win_id and vim.api.nvim_win_is_valid(win_id) then
+        local buf_id = vim.api.nvim_win_get_buf(win_id)
+        if buf_id and vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
+            vim.api.nvim_command(string.format('silent! bdelete! %s', buf_id))
+        end
+
+        if vim.api.nvim_win_is_valid(win_id) then
+            vim.api.nvim_win_close(win_id, true)
+            if not pcall(vim.api.nvim_win_close, win_id, true) then
+                log.trace('Failed to close window: rename_prompt_win/' .. win_id)
+            end
+        end
+    end
+
+    if win_id and renamer._buffers and renamer._buffers[win_id] then
+        renamer._buffers[win_id] = nil
+        renamer._delete_autocmds()
+    end
+end
+
 -- Since there is no way to mock `vim.lsp.buf.clear_references`, this function is used as a replacement.
 function renamer._clear_references()
     vim.lsp.buf.clear_references()
+end
+
+-- Since there is no way to mock `vim.lsp.buf_request`, this function is used as a replacement
+function renamer._make_position_params()
+    return lsp_utils.make_position_params()
+end
+
+-- Since there is no way to mock `vim.lsp.buf_request`, this function is used as a replacement
+function renamer._buf_request(buf_id, method, params, handler)
+    vim.lsp.buf_request(buf_id, method, params, handler)
 end
 
 return renamer
