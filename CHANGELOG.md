@@ -1,3 +1,16 @@
+## [0.2.1](https://github.com/filipdutescu/renamer.nvim/compare/v0.2.0...v0.2.1) (2021-10-30)
+
+
+### Bug Fixes
+
+* cursor placement when finishing `rename()` ([cdcdb17](https://github.com/filipdutescu/renamer.nvim/commit/cdcdb1760822240d9a93cd0f08f10f39d190c7c4)), closes [#33](https://github.com/filipdutescu/renamer.nvim/issues/33) [#34](https://github.com/filipdutescu/renamer.nvim/issues/34)
+* cursor position when cancelled from `insert` ([8a5e63f](https://github.com/filipdutescu/renamer.nvim/commit/8a5e63f68f47cb3cfac82fd57a36143b1881e8d3)), closes [#37](https://github.com/filipdutescu/renamer.nvim/issues/37)
+* **keymaps:** `<c-c>` added an `i` after clear ([59f64e6](https://github.com/filipdutescu/renamer.nvim/commit/59f64e68d69986410d9d77eec76a1cf0aeadaff6)), closes [#30](https://github.com/filipdutescu/renamer.nvim/issues/30)
+* **keymaps:** all keymaps put the user in insert mode ([f9bafe6](https://github.com/filipdutescu/renamer.nvim/commit/f9bafe66c00780c34a8d86e035525cb6cb77bb2a)), closes [#31](https://github.com/filipdutescu/renamer.nvim/issues/31)
+* set Neovim mode to initial one ([cdb40c6](https://github.com/filipdutescu/renamer.nvim/commit/cdb40c61a3460a4bd879d6aa03e06b03083a653a))
+
+
+
 # [0.2.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.1.0...v0.2.0) (2021-10-25)
 
 
