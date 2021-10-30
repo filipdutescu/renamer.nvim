@@ -167,7 +167,11 @@ function renamer.on_close(window_id, should_set_cursor_pos)
     end
 
     if should_set_cursor_pos and pos then
-        vim.api.nvim_win_set_cursor(0, { pos.line, pos.col + 1 })
+        local col = pos.col
+        if initial_mode and not string.match(initial_mode, 'i') then
+            col = col + 1
+        end
+        vim.api.nvim_win_set_cursor(0, { pos.line, col })
     end
 end
 
@@ -301,6 +305,10 @@ function renamer._lsp_rename(word, pos)
 
             if pos then
                 local col = pos.word_start + #word - 1
+                local mode = vim.api.nvim_get_mode().mode
+                if mode and not string.match(mode, 'i') then
+                    col = col - 1
+                end
                 vim.api.nvim_win_set_cursor(0, { pos.line, col })
             end
         end)

@@ -396,21 +396,47 @@ describe('renamer', function()
             clear_references.revert(clear_references)
         end)
 
-        it('should set cursor in the initial position (when `rename()` is cancelled)', function()
-            local expected_win_id = 123
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_is_valid.returns(false)
-            api_mock.nvim_command.returns()
-            api_mock.nvim_win_set_cursor.returns()
-            local clear_references = stub(renamer, '_clear_references').returns()
-            local expected_pos = { col = 1, line = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_pos = expected_pos } }
+        it(
+            'should set cursor in the initial position (when `rename()` is cancelled) (initial mode: `normal`)',
+            function()
+                local expected_win_id = 123
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_is_valid.returns(false)
+                api_mock.nvim_command.returns()
+                api_mock.nvim_win_set_cursor.returns()
+                local clear_references = stub(renamer, '_clear_references').returns()
+                local expected_pos = { col = 1, line = 1 }
+                renamer._buffers[expected_win_id] = { opts = { initial_mode = 'n', initial_pos = expected_pos } }
 
-            renamer.on_close(expected_win_id)
+                renamer.on_close(expected_win_id)
 
-            assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_pos.line, expected_pos.col + 1 })
-            mock.revert(api_mock)
-            clear_references.revert(clear_references)
-        end)
+                assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, {
+                    expected_pos.line,
+                    expected_pos.col + 1,
+                })
+                mock.revert(api_mock)
+                clear_references.revert(clear_references)
+            end
+        )
+
+        it(
+            'should set cursor in the initial position (when `rename()` is cancelled) (initial mode: `insert`)',
+            function()
+                local expected_win_id = 123
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_is_valid.returns(false)
+                api_mock.nvim_command.returns()
+                api_mock.nvim_win_set_cursor.returns()
+                local clear_references = stub(renamer, '_clear_references').returns()
+                local expected_pos = { col = 1, line = 1 }
+                renamer._buffers[expected_win_id] = { opts = { initial_mode = 'i', initial_pos = expected_pos } }
+
+                renamer.on_close(expected_win_id)
+
+                assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_pos.line, expected_pos.col })
+                mock.revert(api_mock)
+                clear_references.revert(clear_references)
+            end
+        )
     end)
 end)
