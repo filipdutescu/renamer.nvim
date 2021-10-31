@@ -33,6 +33,8 @@ local renamer = {}
 ---     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
 ---     -- The string to be used as a prompt prefix. It also sets the buffer to
 ---     -- be a prompt
+---     -- Whether or not to highlight the current word references through LSP
+---     show_refs = true,
 ---     prefix = '',
 ---     -- The keymaps available while in the `renamer` buffer. The example below
 ---     -- overrides the default values, but you can add others as well.
@@ -57,6 +59,7 @@ function renamer.setup(opts)
     renamer.padding = utils.get_value_or_default(opts, 'padding', defaults.padding)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
+    renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
     renamer.prefix = utils.get_value_or_default(opts, 'prefix', defaults.prefix)
     mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
 
@@ -279,7 +282,6 @@ function renamer._delete_autocmds()
     vim.cmd [[augroup end]]
 end
 
--- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
 function renamer._lsp_rename(word, pos)
     local params = renamer._make_position_params()
 
@@ -315,8 +317,14 @@ function renamer._lsp_rename(word, pos)
     end)
 end
 
--- Since there is no way to mock `vim.lsp.buf.document_highlight`, this function is used as a replacement.
 function renamer._document_highlight()
+    if renamer.show_refs then
+        renamer._document_highlight_internal()
+    end
+end
+
+-- Since there is no way to mock `vim.lsp.buf.document_highlight`, this function is used as a replacement.
+function renamer._document_highlight_internal()
     vim.lsp.buf.document_highlight()
 end
 
@@ -341,8 +349,14 @@ function renamer._delete_window(win_id)
     end
 end
 
--- Since there is no way to mock `vim.lsp.buf.clear_references`, this function is used as a replacement.
 function renamer._clear_references()
+    if renamer.show_refs then
+        renamer._clear_references_internal()
+    end
+end
+
+-- Since there is no way to mock `vim.lsp.buf.clear_references`, this function is used as a replacement.
+function renamer._clear_references_internal()
     vim.lsp.buf.clear_references()
 end
 

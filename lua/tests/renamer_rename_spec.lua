@@ -34,6 +34,43 @@ describe('renamer', function()
             document_highlight.revert(document_highlight)
         end)
 
+        it('should highlight references if `show_refs` is `true`', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_get_mode.returns {}
+            spy.on(renamer, '_setup_window')
+            stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight_internal')
+            stub(popup, 'create').returns(1, {})
+
+            renamer.rename()
+
+            assert.spy(document_highlight).was_called()
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+        end)
+
+        it('should not highlight references if `show_refs` is not `true`', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_get_mode.returns {}
+            spy.on(renamer, '_setup_window')
+            stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+            renamer.setup { show_refs = false }
+            local document_highlight = stub(renamer, '_document_highlight_internal')
+            stub(popup, 'create').returns(1, {})
+
+            renamer.rename()
+
+            assert.spy(document_highlight).called_less_than(1)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+        end)
+
         it('should call `_setup_window`', function()
             local api_mock = mock(vim.api, true)
             api_mock.nvim_command.returns()

@@ -30,6 +30,9 @@ LSP feature as its backend.
   uses the Neovim LSP to rename across scopes and project.
 - **Popup customization**: provides several ways to integrate the popup with
   your specific setup, from border characters and title to its colours.
+- **References highlighting:** of the word to be renamed, using Neovim's LSP (see
+  [References highlighting](#references-highlighting))
+- **Keymaps:** predefined keymaps to help you navigate and manipulate the popup
 
 ## Getting started
 
@@ -120,6 +123,8 @@ require('renamer').setup {
     border = true,
     -- The characters which make up the border
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    -- Whether or not to highlight the current word references through LSP
+    show_refs = true,
     -- The string to be used as a prompt prefix. It also sets the buffer to
     -- be a prompt
     prefix = '',
@@ -145,6 +150,8 @@ hi default link RenamerNormal Normal
 hi default link RenamerBorder RenamerNormal
 hi default link RenamerPrefix Identifier
 ```
+
+### References highlighting
 
 `renamer.nvim` also **highlights the current text** wherever it is used in the
 current document, using `vim.lsp.buf.document_highlight()`. In order for it to

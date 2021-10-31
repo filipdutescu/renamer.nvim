@@ -41,6 +41,8 @@ renamer.setup({opts})
         border = true,
         -- The characters which make up the border
         border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+        -- Whether or not to highlight the current word references through LSP
+        show_refs = true,
         -- The string to be used as a prompt prefix. It also sets the buffer to
         -- be a prompt
         prefix = '',
@@ -80,6 +82,9 @@ renamer.setup({opts})
                                       topleft/topright/botright/botleft
                                     (default: { '─', '│', '─', '│',
                                     '╭', '╮', '╯', '╰' })
+        {show_refs}     (boolean)   defines whether or not to highlight the
+                                    current word references through the
+                                    built-in LSP
         {prefix}        (string)    the character to be used as a prompt
                                     prefix (default: '', meaning the popup is
                                     not defined as a prompt)

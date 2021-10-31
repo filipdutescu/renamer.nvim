@@ -16,6 +16,8 @@ local defaults = {
     border = true,
     -- The characters which make up the border
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
+    -- Whether or not to highlight the current word references through LSP
+    show_refs = true,
     -- The string to be used as a prompt prefix. It also sets the buffer to
     -- be a prompt
     prefix = '',

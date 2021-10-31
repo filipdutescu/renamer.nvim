@@ -1,7 +1,7 @@
 local utils = {}
 
 function utils.get_value_or_default(table, name, default)
-    if table and table[name] then
+    if table and not (table[name] == nil) then
         local actual_type, expected_type = type(table[name]), type(default)
         assert(
             type(table[name]) == type(default),

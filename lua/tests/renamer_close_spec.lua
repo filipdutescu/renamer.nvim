@@ -438,5 +438,40 @@ describe('renamer', function()
                 clear_references.revert(clear_references)
             end
         )
+
+        it('should clear references if `show_refs` is `true`', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            api_mock.nvim_command.returns()
+            api_mock.nvim_win_set_cursor.returns()
+            local clear_references = stub(renamer, '_clear_references_internal')
+            local expected_pos = { col = 1, line = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'i', initial_pos = expected_pos } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(clear_references).was_called()
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
+
+        it('should not clear references if `show_refs` is not `true`', function()
+            local expected_win_id = 123
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_is_valid.returns(false)
+            api_mock.nvim_command.returns()
+            api_mock.nvim_win_set_cursor.returns()
+            renamer.setup { show_refs = false }
+            local clear_references = stub(renamer, '_clear_references_internal')
+            local expected_pos = { col = 1, line = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_mode = 'i', initial_pos = expected_pos } }
+
+            renamer.on_close(expected_win_id)
+
+            assert.spy(clear_references).called_less_than(1)
+            mock.revert(api_mock)
+            clear_references.revert(clear_references)
+        end)
     end)
 end)
