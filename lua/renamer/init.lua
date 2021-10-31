@@ -84,15 +84,13 @@ function renamer.rename()
     local cword = vim.fn.expand '<cword>'
     local line, col = renamer._get_cursor()
     local word_start, _ = renamer._get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col)
-    local prompt_col_no, prompt_line_no = col - word_start, 2
+    local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
     local border_highlight = 'RenamerBorder'
 
     if not renamer.border == true then
         prompt_line_no = 1
         border_highlight = nil
-    else
-        prompt_col_no = prompt_col_no + 1
     end
     if lines_from_win_end < prompt_line_no + 1 then
         prompt_line_no = -prompt_line_no

@@ -140,7 +140,7 @@ describe('renamer', function()
 
             it('should use cursor line for line position if there is enough space below', function()
                 local cursor_line = 1
-                local expected_line_no = 2
+                local expected_line_no = 1
                 local expected_line = 'cursor+' .. expected_line_no
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { cursor_line, 2 }
@@ -159,7 +159,7 @@ describe('renamer', function()
             end)
 
             it('should use flip line position if at the end of the screen', function()
-                local expected_line_no = 2
+                local expected_line_no = 1
                 local expected_line = 'cursor-' .. expected_line_no
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, 2 }
