@@ -83,7 +83,7 @@ end
 function renamer.rename()
     local cword = vim.fn.expand '<cword>'
     local line, col = renamer._get_cursor()
-    local word_start, _ = renamer._get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col)
+    local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
     local border_highlight = 'RenamerBorder'
@@ -186,18 +186,6 @@ function renamer._get_cursor()
     local cursor = vim.api.nvim_win_get_cursor(0)
 
     return cursor[1], cursor[2]
-end
-
-function renamer._get_word_boundaries_in_line(line, word, line_pos)
-    local i = 1
-    local word_start, word_end = string.find(line, word, line_pos - i)
-
-    while word_end == nil or line_pos - i < 0 do
-        i = i + 1
-        word_start, word_end = string.find(line, word, line_pos - i)
-    end
-
-    return word_start, word_end
 end
 
 function renamer._setup_window(prompt_win_id)

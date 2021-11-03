@@ -1,4 +1,5 @@
 local renamer = require 'renamer'
+local utils = require 'renamer.utils'
 
 local popup = require 'plenary.popup'
 
@@ -22,7 +23,7 @@ describe('renamer', function()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
                 local set_prompt_border_win_style = spy.on(renamer, '_set_prompt_border_win_style')
-                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, { border = { win_id = 1 } })
 
@@ -42,7 +43,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -61,7 +62,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -80,7 +81,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(expected_col_no, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -100,7 +101,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(cursor_col, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -121,7 +122,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(word_start, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -147,7 +148,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(cursor_line + expected_line_no + 1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -166,7 +167,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -185,7 +186,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(expected_col_no + 1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(expected_col_no + 1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -205,7 +206,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(cursor_col + 1, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(cursor_col + 1, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
@@ -226,7 +227,7 @@ describe('renamer', function()
                 api_mock.nvim_command.returns()
                 api_mock.nvim_buf_line_count.returns(1)
                 api_mock.nvim_get_mode.returns {}
-                stub(renamer, '_get_word_boundaries_in_line').returns(word_start, 2)
+                stub(utils, 'get_word_boundaries_in_line').returns(word_start, 2)
                 local document_highlight = stub(renamer, '_document_highlight').returns()
                 stub(popup, 'create').returns(1, {})
 
