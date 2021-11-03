@@ -64,7 +64,8 @@ Using [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
 use {
-  'filipdutescu/renamer.nvim', branch = 'master'
+  'filipdutescu/renamer.nvim',
+  branch = 'master',
   requires = { {'nvim-lua/plenary.nvim'} }
 }
 ```
