@@ -100,6 +100,7 @@ function renamer.rename()
 
     local popup_opts = {
         title = renamer.title,
+        titlehighlight = 'RenamerTitle',
         padding = renamer.padding,
         border = renamer.border,
         borderchars = renamer.border_chars,

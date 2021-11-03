@@ -148,6 +148,7 @@ following highlight groups can also be modified to theme the popup colours:
 ```viml
 hi default link RenamerNormal Normal
 hi default link RenamerBorder RenamerNormal
+hi default link RenamerTitle Identifier
 hi default link RenamerPrefix Identifier
 ```
 

@@ -130,6 +130,7 @@ describe('renamer', function()
             local word_start = 1
             local expected_opts = {
                 title = renamer.title,
+                titlehighlight = 'RenamerTitle',
                 padding = renamer.padding,
                 border = renamer.border,
                 borderchars = renamer.border_chars,
