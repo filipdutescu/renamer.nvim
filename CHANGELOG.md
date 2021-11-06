@@ -1,3 +1,21 @@
+# [0.3.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.2.1...v0.3.0) (2021-11-06)
+
+
+### Bug Fixes
+
+* **highlight:** remove prefix highlight ([2f77f7e](https://github.com/filipdutescu/renamer.nvim/commit/2f77f7e7e52b2b9f54b145f15d32bc934bb00117))
+* placement when border is disabled ([fdcafb9](https://github.com/filipdutescu/renamer.nvim/commit/fdcafb93276c1638b43287cf76d72e520ddf8744)), closes [#42](https://github.com/filipdutescu/renamer.nvim/issues/42)
+* position when word appears multiple times ([d31cc3c](https://github.com/filipdutescu/renamer.nvim/commit/d31cc3c5326d1ddde97c2f75c33ec4da713a2aff)), closes [#43](https://github.com/filipdutescu/renamer.nvim/issues/43)
+* remove prefix and prompt mode ([52c336d](https://github.com/filipdutescu/renamer.nvim/commit/52c336d003c9b9dd1b1326a3f7199bf147270860)), closes [#52](https://github.com/filipdutescu/renamer.nvim/issues/52)
+
+
+### Features
+
+* **highlighting:** add popup title highlighting ([8dbaf3d](https://github.com/filipdutescu/renamer.nvim/commit/8dbaf3d225db2f42713b65a20a8ed0eebed2c08b)), closes [#45](https://github.com/filipdutescu/renamer.nvim/issues/45)
+* **highlight:** make references highlighting optional ([000d585](https://github.com/filipdutescu/renamer.nvim/commit/000d585342e14031aa754d25ec1919cce0800f39)), closes [#40](https://github.com/filipdutescu/renamer.nvim/issues/40)
+
+
+
 ## [0.2.1](https://github.com/filipdutescu/renamer.nvim/compare/v0.2.0...v0.2.1) (2021-10-30)
 
 
