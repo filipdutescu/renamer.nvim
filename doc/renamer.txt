@@ -82,7 +82,7 @@ renamer.setup({opts})
                                     '╭', '╮', '╯', '╰' })
         {show_refs}     (boolean)   defines whether or not to highlight the
                                     current word references through the
-                                    built-in LSP
+                                    built-in LSP (default: true)
         {mappings}      (table)     the keymaps that should be available in
                                     the buffer, alongside their respective
                                     actions (default: see
