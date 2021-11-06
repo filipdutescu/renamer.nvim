@@ -9,7 +9,6 @@ describe('defaults', function()
             border = true,
             border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
             show_refs = true,
-            prefix = '',
             mappings = mappings.bindings,
         }
 

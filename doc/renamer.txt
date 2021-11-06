@@ -44,9 +44,6 @@ renamer.setup({opts})
         border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
         -- Whether or not to highlight the current word references through LSP
         show_refs = true,
-        -- The string to be used as a prompt prefix. It also sets the buffer to
-        -- be a prompt
-        prefix = '',
         -- The keymaps available while in the `renamer` buffer. The example below
         -- overrides the default values, but you can add others as well.
         mappings = {
@@ -86,9 +83,6 @@ renamer.setup({opts})
         {show_refs}     (boolean)   defines whether or not to highlight the
                                     current word references through the
                                     built-in LSP
-        {prefix}        (string)    the character to be used as a prompt
-                                    prefix (default: '', meaning the popup is
-                                    not defined as a prompt)
         {mappings}      (table)     the keymaps that should be available in
                                     the buffer, alongside their respective
                                     actions (default: see
@@ -200,16 +194,6 @@ RenamerTitle: ~
 
     An example of how to change the colour is:
         `hi default link RenamerTitle Title`
-
-RenamerPrefix: ~
-    This controls the aspect of the popup prefix, found inside the modifiable
-    buffer (which is the one used to rename the word under the cursor), if the
-    popup has "prompt-mode" enabled (default: links to the `Identifier`
-    highlight group). See |renamer.setup| for more information regarding the
-    "prompt-mode".
-
-    An example of how to change the colour is:
-        `hi default link RenamerPrefix SpecialKey`
 
 
 There are also 3 other highlight groups, not directly used by Renamer.nvim,

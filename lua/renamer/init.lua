@@ -12,7 +12,7 @@ local mappings = require 'renamer.mappings'
 --- @field public padding integer[]
 --- @field public border boolean
 --- @field public border_chars string[]
---- @field public prefix string
+--- @field public show_refs boolean
 --- @field private _buffers table
 local renamer = {}
 
@@ -31,11 +31,8 @@ local renamer = {}
 ---     border = true,
 ---     -- The characters which make up the border
 ---     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
----     -- The string to be used as a prompt prefix. It also sets the buffer to
----     -- be a prompt
 ---     -- Whether or not to highlight the current word references through LSP
 ---     show_refs = true,
----     prefix = '',
 ---     -- The keymaps available while in the `renamer` buffer. The example below
 ---     -- overrides the default values, but you can add others as well.
 ---     mappings = {
@@ -60,7 +57,6 @@ function renamer.setup(opts)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
-    renamer.prefix = utils.get_value_or_default(opts, 'prefix', defaults.prefix)
     mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
 
     renamer._buffers = {}
@@ -194,11 +190,6 @@ function renamer._setup_window(prompt_win_id)
     vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
     vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
 
-    if renamer.prefix and renamer.prefix ~= '' then
-        vim.api.nvim_buf_set_option(prompt_buf_id, 'buftype', 'prompt')
-        vim.fn.prompt_setprompt(prompt_buf_id, renamer.prefix)
-    end
-
     vim.api.nvim_command [[startinsert]]
     renamer._create_autocmds(prompt_win_id)
 
@@ -223,18 +214,6 @@ function renamer._set_prompt_win_style(prompt_win_id)
     if prompt_win_id then
         vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
         vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
-
-        if renamer.prefix and renamer.prefix ~= '' then
-            local prompt_buf_id = vim.api.nvim_win_get_buf(prompt_win_id)
-            vim.api.nvim_buf_add_highlight(
-                prompt_buf_id,
-                vim.api.nvim_create_namespace 'renamer_prompt_prefix',
-                'RenamerPrefix',
-                0,
-                0,
-                #renamer.prefix + 1
-            )
-        end
 
         if renamer._buffers and renamer._buffers[prompt_win_id] then
             local opts = renamer._buffers[prompt_win_id]

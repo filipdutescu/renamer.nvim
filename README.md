@@ -126,9 +126,6 @@ require('renamer').setup {
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     -- Whether or not to highlight the current word references through LSP
     show_refs = true,
-    -- The string to be used as a prompt prefix. It also sets the buffer to
-    -- be a prompt
-    prefix = '',
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
     mappings = {
@@ -150,7 +147,6 @@ following highlight groups can also be modified to theme the popup colours:
 hi default link RenamerNormal Normal
 hi default link RenamerBorder RenamerNormal
 hi default link RenamerTitle Identifier
-hi default link RenamerPrefix Identifier
 ```
 
 ### References highlighting

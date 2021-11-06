@@ -5,7 +5,7 @@ local mappings = require 'renamer.mappings'
 --- @field public padding integer[]
 --- @field public border boolean
 --- @field public border_chars string[]
---- @field public prefix string
+--- @field public show_refs boolean
 --- @field public mappings string
 local defaults = {
     -- The popup title, shown if `border` is true
@@ -18,9 +18,6 @@ local defaults = {
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     -- Whether or not to highlight the current word references through LSP
     show_refs = true,
-    -- The string to be used as a prompt prefix. It also sets the buffer to
-    -- be a prompt
-    prefix = '',
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
     mappings = mappings.bindings,
