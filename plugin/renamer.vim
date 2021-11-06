@@ -11,5 +11,4 @@ let g:loaded_renamer = 1
 hi default link RenamerNormal Normal
 hi default link RenamerBorder RenamerNormal
 hi default link RenamerTitle Identifier
-hi default link RenamerPrefix Identifier
 
