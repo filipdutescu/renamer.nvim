@@ -7,10 +7,10 @@ the LSP API to rename the current word under the cursor.
 
 Getting started with renamer:
   1. Run `:checkhealth renamer` to make sure everything is installed.
-  2. Put a `require("renamer").setup()` call somewhere in your neovim config.
+  2. Put a `require('renamer').setup()` call somewhere in your neovim config.
   3. Read |renamer.setup| to check what config keys are available and what
      you can put inside the setup call
-  4. Evalulate it working with `:lua require("renamer").rename()`
+  4. Evalulate it working with `:lua require('renamer').rename()`
 
 To find out more:
 https://github.com/filipdutescu/renamer.nvim
@@ -18,6 +18,7 @@ https://github.com/filipdutescu/renamer.nvim
   :h renamer.setup
   :h renamer.rename
   :h renamer.mappings
+  :h renamer.highlights
 
 
 
@@ -165,7 +166,57 @@ described in |renamer.setup|:
 <c-r>               Redo changes that were undone. Behind the scenes, it uses
                     the "<c-r>" normal mode keymap.
 
-                        See ``:help CTRL-R`
+                        See `:help CTRL-R`
+
+
+
+===============================================================================
+                                                           *renamer.highlights*
+
+Highlights are defined to ensure that, should the defaults make the plugin
+look weird or be ilegible, the user has the option to swap them for others.
+The following groups are defined:
+
+RenamerNormal: ~
+    Controls the aspect of the text inside the modifiable buffer (which is the
+    one used to rename the word under the cursor). By default, it is also the
+    highlight group used by `RenamerBorder` (default: links to the |Normal|
+    highlight group).
+
+    An example of how to change the colour is:
+        `hi default link RenamerNormal Pmenu`
+
+RenamerBorder: ~
+    This controls the aspect of the border surrounding the modifiable buffer
+    if it was enabled. (default: links to the `RenamerNormal` highlight group).
+
+    An example of how to change the colour is:
+        `hi default link RenamerBorder Pmenu`
+
+RenamerTitle: ~
+    This controls the aspect of the popup title, found on the top border, if
+    border and title are enabled and set respectively. (default: links to the
+    `Identifier` highlight group).
+
+    An example of how to change the colour is:
+        `hi default link RenamerTitle Title`
+
+RenamerPrefix: ~
+    This controls the aspect of the popup prefix, found inside the modifiable
+    buffer (which is the one used to rename the word under the cursor), if the
+    popup has "prompt-mode" enabled (default: links to the `Identifier`
+    highlight group). See |renamer.setup| for more information regarding the
+    "prompt-mode".
+
+    An example of how to change the colour is:
+        `hi default link RenamerPrefix SpecialKey`
+
+
+There are also 3 other highlight groups, not directly used by Renamer.nvim,
+but rather by Neovim. They affect the references highlighting which can be
+toggled on/off in |renamer.setup()|. They are `LspReferenceText`,
+`LspReferenceRead` and `LspReferenceWrite`. For more information, please see
+|vim.lsp.buf.document_highlight()|.
 
 
 vim:tw=78:ts=8:ft=help:norl:
