@@ -118,6 +118,29 @@ describe('renamer', function()
             lsp_rename.revert(lsp_rename)
         end)
 
+        it('should not call `_lsp_rename` if buffer content is an empty string', function()
+            local expected_win_id, expected_buf_id = 123, 321
+            local expected_content = ''
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_buf.returns(expected_buf_id)
+            api_mock.nvim_buf_get_lines.returns { expected_content }
+            api_mock.nvim_command.returns()
+            local on_close = stub(renamer, 'on_close').returns()
+            local lsp_rename = stub(renamer, '_lsp_rename').returns()
+            local expected_pos = { word_start = 1, line = 1, col = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
+
+            renamer.on_submit(expected_win_id)
+
+            assert.spy(lsp_rename).called_less_than(1)
+            assert.spy(on_close).was_called_with(expected_win_id, true)
+            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
+            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
+            mock.revert(api_mock)
+            on_close.revert(on_close)
+            lsp_rename.revert(lsp_rename)
+        end)
+
         it('should set cursor after the end of the new word', function()
             local expected_win_id, expected_buf_id = 123, 321
             local expected_content = 'test'

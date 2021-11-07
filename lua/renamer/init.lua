@@ -108,6 +108,7 @@ function renamer.rename()
         posinvert = false,
         cursor_line = true,
         enter = true,
+        initial_word = cword,
         initial_mode = vim.api.nvim_get_mode().mode,
         initial_pos = {
             word_start = word_start,
@@ -137,11 +138,16 @@ function renamer.on_submit(window_id)
         local pos = opts and opts.initial_pos
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
-        log.fmt_info('Submitted word: "%s".', new_word)
 
         renamer._delete_autocmds()
-        renamer.on_close(window_id, false)
-        renamer._lsp_rename(new_word, pos)
+        if not (new_word == '') then
+            log.fmt_info('Submitted word: "%s".', new_word)
+            renamer.on_close(window_id, false)
+            renamer._lsp_rename(new_word, pos)
+        else
+            renamer.on_close(window_id, true)
+            log.fmt_error('Cannot rename "%s" to and empty string.', opts.initial_word)
+        end
     end
 end
 

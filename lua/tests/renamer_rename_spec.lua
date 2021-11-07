@@ -143,6 +143,7 @@ describe('renamer', function()
                 posinvert = false,
                 cursor_line = true,
                 enter = true,
+                initial_word = 'test',
                 initial_mode = 'test',
                 initial_pos = {
                     word_start = word_start,
