@@ -77,13 +77,26 @@ end
 --- @return integer prompt_window_id
 --- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename()
+    local win_height = vim.api.nvim_win_get_height(0)
+    local win_width = vim.api.nvim_win_get_width(0)
     local cword = vim.fn.expand '<cword>'
     local popup_opts = renamer._create_default_popup_opts(cword)
+    local is_height_too_short = renamer.border == true and win_height < 4
+        or not (renamer.border == true) and win_height < 2
+    local is_width_too_short = renamer.border == true and win_width < popup_opts.minwidth + 2
+        or not (renamer.border == true) and win_width < popup_opts.minwidth
+
+    if is_height_too_short or is_width_too_short then
+        log.error 'Window does not provide enough space for the popup to be drawn.'
+        renamer._nvim_lsp_rename()
+        return
+    end
+
     local line, col = renamer._get_cursor()
     local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
-    local width, win_width = 0, vim.api.nvim_win_get_width(0)
+    local width = 0
 
     if renamer.title then
         width = #renamer.title + 4
@@ -270,6 +283,10 @@ function renamer._delete_autocmds()
     vim.cmd [[augroup RenamerInsert]]
     vim.cmd [[  au!]]
     vim.cmd [[augroup end]]
+end
+
+function renamer._nvim_lsp_rename()
+    vim.lsp.buf.rename()
 end
 
 function renamer._lsp_rename(word, pos)
