@@ -4,6 +4,8 @@
 
 # renamer.nvim
 
+![Demo](https://j.gifs.com/qQAYmD.gif)
+
 `renamer.nvim` is a Visual-Studio-Code-like renaming UI for Neovim, writen in
 Lua. It is considerably customizable and uses the [Neovim >= 0.5.0](https://github.com/neovim/neovim/releases/tag/v0.5.0)
 LSP feature as its backend.
@@ -176,7 +178,29 @@ to users and mimic the default behaviour of their normal mode equivalents.
 
 ## Media
 
-TODO - Should add media to showcase the plugin
+Here are some examples of various parts of `renamer.nvim` that you can
+customize, to hopefully give you a better idea of how to integrate the plugin
+and maybe convince you to start using it.
+
+- **Demo:**
+
+![Demo](https://j.gifs.com/qQAYmD.gif)
+
+- **Border customization:**
+
+![border-chars](media/renamer_border_chars.png "Border customization")
+
+or no border:
+
+![no-border](media/renamer_no_border.png "No border")
+
+- **Highlight references:**
+
+![highlight-references](media/renamer_highlight_references.png "Highlight references")
+
+- **No title:**
+
+![no-title](media/renamer_no_title.png "No title")
 
 ## Contributing
 
