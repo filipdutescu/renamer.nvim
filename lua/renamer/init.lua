@@ -78,25 +78,24 @@ end
 --- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename()
     local cword = vim.fn.expand '<cword>'
+    local popup_opts = renamer._create_default_popup_opts(cword)
     local line, col = renamer._get_cursor()
     local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
-    local border_highlight = 'RenamerBorder'
     local width, win_width = 0, vim.api.nvim_win_get_width(0)
+
     if renamer.title then
         width = #renamer.title + 4
     end
-
+    if width >= win_width or #cword > width then
+        width = #cword
+    end
     if not (renamer.border == true) then
         prompt_line_no = 1
-        border_highlight = nil
     end
     if lines_from_win_end < prompt_line_no + 1 then
         prompt_line_no = -prompt_line_no
-    end
-    if #cword > width then
-        width = #cword
     end
     if word_start + width >= win_width then
         prompt_col_no = prompt_col_no + width - win_width + word_start
@@ -107,27 +106,13 @@ function renamer.rename()
 
     renamer._document_highlight()
 
-    local popup_opts = {
-        title = renamer.title,
-        titlehighlight = 'RenamerTitle',
-        padding = renamer.padding,
-        border = renamer.border,
-        borderchars = renamer.border_chars,
-        highlight = 'RenamerNormal',
-        borderhighlight = border_highlight,
-        width = width,
-        line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no,
-        col = 'cursor-' .. prompt_col_no,
-        posinvert = false,
-        cursor_line = true,
-        enter = true,
-        initial_word = cword,
-        initial_mode = vim.api.nvim_get_mode().mode,
-        initial_pos = {
-            word_start = word_start,
-            col = col,
-            line = line,
-        },
+    popup_opts.width = width
+    popup_opts.line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no
+    popup_opts.col = 'cursor-' .. prompt_col_no
+    popup_opts.initial_pos = {
+        word_start = word_start,
+        col = col,
+        line = line,
     }
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
 
@@ -190,6 +175,26 @@ function renamer.on_close(window_id, should_set_cursor_pos)
         end
         vim.api.nvim_win_set_cursor(0, { pos.line, col })
     end
+end
+
+function renamer._create_default_popup_opts(cword)
+    return {
+        title = renamer.title,
+        titlehighlight = 'RenamerTitle',
+        padding = renamer.padding,
+        border = renamer.border,
+        borderchars = renamer.border_chars,
+        highlight = 'RenamerNormal',
+        borderhighlight = 'RenamerBorder',
+        minwidth = 15,
+        maxwidth = 45,
+        minheight = 1,
+        posinvert = false,
+        cursor_line = true,
+        enter = true,
+        initial_word = cword,
+        initial_mode = vim.api.nvim_get_mode().mode,
+    }
 end
 
 function renamer._get_cursor()

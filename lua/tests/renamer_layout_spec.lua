@@ -11,6 +11,56 @@ local eq = assert.are.same
 
 describe('renamer', function()
     describe('rename', function()
+        describe('popup width', function()
+            it('should equal to cword length if title is too long', function()
+                renamer.setup { title = string.rep('a', 16) }
+                local cursor_col, word_start, win_width = 10, 8, 15
+                local cword = 'test'
+                local expected_width = #cword
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
+                api_mock.nvim_command.returns()
+                api_mock.nvim_buf_line_count.returns(1)
+                api_mock.nvim_get_mode.returns {}
+                api_mock.nvim_win_get_width.returns(win_width)
+                local expand = stub(vim.fn, 'expand').returns(cword)
+                stub(utils, 'get_word_boundaries_in_line').returns(word_start, word_start + expected_width)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
+                stub(popup, 'create').returns(1, {})
+
+                local _, opts = renamer.rename()
+
+                eq(expected_width, opts.opts.width)
+                mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
+                expand.revert(expand)
+            end)
+
+            it('should equal to cword length if otherwise too short', function()
+                renamer.setup { title = 'a' }
+                local cursor_col, word_start, win_width = 10, 8, 15
+                local cword = 'testing'
+                local expected_width = #cword
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
+                api_mock.nvim_command.returns()
+                api_mock.nvim_buf_line_count.returns(1)
+                api_mock.nvim_get_mode.returns {}
+                api_mock.nvim_win_get_width.returns(win_width)
+                local expand = stub(vim.fn, 'expand').returns(cword)
+                stub(utils, 'get_word_boundaries_in_line').returns(word_start, word_start + expected_width)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
+                stub(popup, 'create').returns(1, {})
+
+                local _, opts = renamer.rename()
+
+                eq(expected_width, opts.opts.width)
+                mock.revert(api_mock)
+                document_highlight.revert(document_highlight)
+                expand.revert(expand)
+            end)
+        end)
+
         describe('with border', function()
             before_each(function()
                 renamer.setup()
