@@ -83,13 +83,26 @@ function renamer.rename()
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
     local border_highlight = 'RenamerBorder'
+    local width, win_width = 0, vim.api.nvim_win_get_width(0)
+    if renamer.title then
+        width = #renamer.title + 4
+    end
 
-    if not renamer.border == true then
+    if not (renamer.border == true) then
         prompt_line_no = 1
         border_highlight = nil
     end
     if lines_from_win_end < prompt_line_no + 1 then
         prompt_line_no = -prompt_line_no
+    end
+    if #cword > width then
+        width = #cword
+    end
+    if word_start + width >= win_width then
+        prompt_col_no = prompt_col_no + width - win_width + word_start
+        if renamer.border == true then
+            prompt_col_no = prompt_col_no + 4
+        end
     end
 
     renamer._document_highlight()
@@ -102,7 +115,7 @@ function renamer.rename()
         borderchars = renamer.border_chars,
         highlight = 'RenamerNormal',
         borderhighlight = border_highlight,
-        width = #renamer.title + 4,
+        width = width,
         line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no,
         col = 'cursor-' .. prompt_col_no,
         posinvert = false,
