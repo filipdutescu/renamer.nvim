@@ -5,7 +5,12 @@ describe('defaults', function()
         local mappings = require 'renamer.mappings'
         local expected_defaults = {
             title = 'Rename',
-            padding = { 0, 0, 0, 0 },
+            padding = {
+                top = 0,
+                left = 0,
+                bottom = 0,
+                right = 0,
+            },
             border = true,
             border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
             show_refs = true,

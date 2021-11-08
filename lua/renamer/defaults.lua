@@ -2,7 +2,7 @@ local mappings = require 'renamer.mappings'
 
 --- @class Defaults
 --- @field public title string
---- @field public padding integer[]
+--- @field public padding table
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
@@ -11,7 +11,12 @@ local defaults = {
     -- The popup title, shown if `border` is true
     title = 'Rename',
     -- The padding around the popup content
-    padding = { 0, 0, 0, 0 },
+    padding = {
+        top = 0,
+        left = 0,
+        bottom = 0,
+        right = 0,
+    },
     -- Whether or not to shown a border around the popup
     border = true,
     -- The characters which make up the border

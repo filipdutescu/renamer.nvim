@@ -26,7 +26,12 @@ local renamer = {}
 ---     -- The popup title, shown if `border` is true
 ---     title = 'Rename',
 ---     -- The padding around the popup content
----     padding = { 0, 0, 0, 0 },
+---     padding = {
+---         top = 0,
+---         left = 0,
+---         bottom = 0,
+---         right = 0,
+---     }
 ---     -- Whether or not to shown a border around the popup
 ---     border = true,
 ---     -- The characters which make up the border
@@ -53,7 +58,12 @@ function renamer.setup(opts)
     local defaults = require 'renamer.defaults'
 
     renamer.title = utils.get_value_or_default(opts, 'title', defaults.title)
-    renamer.padding = utils.get_value_or_default(opts, 'padding', defaults.padding)
+    renamer.padding = {
+        top = utils.get_value_or_default(opts.padding, 'top', defaults.padding.top),
+        left = utils.get_value_or_default(opts.padding, 'left', defaults.padding.left),
+        bottom = utils.get_value_or_default(opts.padding, 'bottom', defaults.padding.bottom),
+        right = utils.get_value_or_default(opts.padding, 'right', defaults.padding.right),
+    }
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
@@ -81,10 +91,12 @@ function renamer.rename()
     local win_width = vim.api.nvim_win_get_width(0)
     local cword = vim.fn.expand '<cword>'
     local popup_opts = renamer._create_default_popup_opts(cword)
-    local is_height_too_short = renamer.border == true and win_height < 4
-        or not (renamer.border == true) and win_height < 2
-    local is_width_too_short = renamer.border == true and win_width < popup_opts.minwidth + 2
-        or not (renamer.border == true) and win_width < popup_opts.minwidth
+    local padding_top_bottom = renamer.padding.top + renamer.padding.bottom
+    local padding_left_right = renamer.padding.left + renamer.padding.right
+    local is_height_too_short = renamer.border == true and win_height < 4 + padding_top_bottom
+        or not (renamer.border == true) and win_height < 2 + padding_top_bottom
+    local is_width_too_short = renamer.border == true and win_width < popup_opts.minwidth + 2 + padding_left_right
+        or not (renamer.border == true) and win_width < popup_opts.minwidth + padding_left_right
 
     if is_height_too_short or is_width_too_short then
         log.error 'Window does not provide enough space for the popup to be drawn.'
@@ -191,10 +203,11 @@ function renamer.on_close(window_id, should_set_cursor_pos)
 end
 
 function renamer._create_default_popup_opts(cword)
+    local p = renamer.padding
     return {
         title = renamer.title,
         titlehighlight = 'RenamerTitle',
-        padding = renamer.padding,
+        padding = { p.top, p.right, p.bottom, p.left },
         border = renamer.border,
         borderchars = renamer.border_chars,
         highlight = 'RenamerNormal',

@@ -39,7 +39,12 @@ describe('renamer', function()
         it('should use defaults where no options are passed ("padding" passed)', function()
             local mappings = require 'renamer.mappings'
             local opts = {
-                padding = { 1, 2, 3, 4 },
+                padding = {
+                    top = 1,
+                    left = 2,
+                    bottom = 3,
+                    right = 4,
+                },
             }
 
             renamer.setup(opts)
@@ -127,7 +132,12 @@ describe('renamer', function()
             local mappings = require 'renamer.mappings'
             local opts = {
                 title = 'abc',
-                padding = { 1, 2, 3, 4 },
+                padding = {
+                    top = 1,
+                    left = 2,
+                    bottom = 3,
+                    right = 4,
+                },
                 border = false,
                 border_chars = { '═', '║', '═', '║', '╔', '╗', '╝', '╚' },
                 show_refs = false,

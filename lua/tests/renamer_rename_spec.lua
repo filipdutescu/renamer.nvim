@@ -105,6 +105,67 @@ describe('renamer', function()
             expand.revert(expand)
         end)
 
+        it('should fallback to `vim.lsp.buf.rename()` if padding is too large (with border)', function()
+            renamer.setup {
+                padding = {
+                    top = 20,
+                    left = 20,
+                    bottom = 20,
+                    right = 20,
+                },
+            }
+            local expected_cword = 'test'
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns()
+            api_mock.nvim_win_get_height.returns(15)
+            api_mock.nvim_win_get_width.returns(10)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            local expand = stub(vim.fn, 'expand').returns(expected_cword)
+            local rename = stub(renamer, '_nvim_lsp_rename').returns()
+            local document_highlight = stub(renamer, '_document_highlight').returns()
+            stub(popup, 'create').returns(1, {})
+
+            renamer.rename()
+
+            assert.spy(rename).called_at_least(1)
+            assert.spy(rename).called_at_most(1)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+            rename.revert(rename)
+            expand.revert(expand)
+        end)
+
+        it('should fallback to `vim.lsp.buf.rename()` if padding is too large (without border)', function()
+            renamer.setup {
+                border = false,
+                padding = {
+                    top = 20,
+                    left = 20,
+                    bottom = 20,
+                    right = 20,
+                },
+            }
+            local expected_cword = 'test'
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns()
+            api_mock.nvim_win_get_height.returns(15)
+            api_mock.nvim_win_get_width.returns(10)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            local expand = stub(vim.fn, 'expand').returns(expected_cword)
+            local rename = stub(renamer, '_nvim_lsp_rename').returns()
+            local document_highlight = stub(renamer, '_document_highlight').returns()
+            stub(popup, 'create').returns(1, {})
+
+            renamer.rename()
+
+            assert.spy(rename).called_at_least(1)
+            assert.spy(rename).called_at_most(1)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+            rename.revert(rename)
+            expand.revert(expand)
+        end)
+
         it('should call `_get_word_boundaries_in_line`', function()
             local expected_cword, expected_line, expected_col = 'test', 1, 2
             local api_mock = mock(vim.api, true)
@@ -237,10 +298,11 @@ describe('renamer', function()
         it('should return the buffer ID and the popup options', function()
             local expected_col_no, expected_line_no = 2, 2
             local word_start = 1
+            local p = renamer.padding
             local expected_opts = {
                 title = renamer.title,
                 titlehighlight = 'RenamerTitle',
-                padding = renamer.padding,
+                padding = { p.top, p.right, p.bottom, p.left },
                 border = renamer.border,
                 borderchars = renamer.border_chars,
                 highlight = 'RenamerNormal',
