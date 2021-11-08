@@ -1,3 +1,33 @@
+# [1.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.3.0...v1.0.0) (2021-11-08)
+
+
+### Bug Fixes
+
+* removed renaming as empty string ([b20cc39](https://github.com/filipdutescu/renamer.nvim/commit/b20cc399b8ea24011bf78f17477432d1500df9b0)), closes [#57](https://github.com/filipdutescu/renamer.nvim/issues/57)
+
+
+* fix(padding)!: validate padding before drawing popup ([da75d77](https://github.com/filipdutescu/renamer.nvim/commit/da75d77397498b2fe8ea0206aec2486ed8325fbf)), closes [#62](https://github.com/filipdutescu/renamer.nvim/issues/62)
+* fix!: fallback to LSP rename if popup cannot be drawn ([0f8fd8f](https://github.com/filipdutescu/renamer.nvim/commit/0f8fd8f9315d18a3637fe1c95bfd8cc315e9bb6e)), closes [#12](https://github.com/filipdutescu/renamer.nvim/issues/12)
+* fix!: width adjusts to content and window ([956989a](https://github.com/filipdutescu/renamer.nvim/commit/956989a103f7e5441476ee00c02cfaac0432aaba)), closes [#6](https://github.com/filipdutescu/renamer.nvim/issues/6)
+* fix!: popup draws correctly on screen edges ([6b87076](https://github.com/filipdutescu/renamer.nvim/commit/6b8707689a67d63fedaa1b0bac4ae1ef6e92d5ae)), closes [#5](https://github.com/filipdutescu/renamer.nvim/issues/5)
+
+
+### BREAKING CHANGES
+
+* Validate padding alongside the window width and
+height, before drawing popup.
+* Validate if the window height and width allow for the
+popup to be drawn, otherwise fallback to `vim.lsp.buf.rename()` and log
+an error.
+* Partially hide the title if the width would be to large
+for the current window. Add minimum and maximum width and minimum
+height. Refactor the creation of popup options.
+* If the `cword` has a length greater than the `width`,
+set `width` to that of the `cword`. Add default width of 0, if `title`
+is not set.
+
+
+
 # [0.3.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.2.1...v0.3.0) (2021-11-06)
 
 
