@@ -87,7 +87,7 @@ and how to configure it.
 ## Usage
 
 To rename the current word using `renamer.nvim`, you need to call the `rename`
-method (`require('renamer).rename()`).
+method (`require('renamer').rename()`).
 
 The recommended way of doing it is by setting up keybindings to call the function:
 
