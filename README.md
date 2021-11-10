@@ -133,6 +133,8 @@ require('renamer').setup {
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     -- Whether or not to highlight the current word references through LSP
     show_refs = true,
+    -- Whether or not to add resulting changes to the quickfix list
+    with_qf_list = true,
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
     mappings = {

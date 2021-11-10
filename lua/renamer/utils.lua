@@ -43,4 +43,40 @@ function utils.get_word_boundaries_in_line(line, word, line_pos)
     return closest_word_start, closest_word_end
 end
 
+function utils.set_qf_list(changes)
+    if changes then
+        local qf_list, i = {}, 0
+        for file, data in pairs(changes) do
+            local buf_id = -1
+            if vim.uri and vim.uri.uri_to_bufnr then
+                buf_id = vim.uri.uri_to_bufnr(file)
+            else
+                local file_path = string.gsub(file, 'file://', '')
+                buf_id = vim.fn.bufadd(file_path)
+            end
+            vim.fn.bufload(buf_id)
+            file = string.gsub(file, 'file://', '')
+
+            for _, change in ipairs(data) do
+                local row, col = change.range.start.line, change.range.start.character
+                if row == 0 then
+                    row = 1
+                end
+                i = i + 1
+                local line = vim.api.nvim_buf_get_lines(buf_id, row, row + 1, false)
+                qf_list[i] = {
+                    text = line and line[1],
+                    filename = file,
+                    lnum = row,
+                    col = col,
+                }
+            end
+        end
+
+        if qf_list and i > 0 then
+            vim.fn.setqflist(qf_list)
+        end
+    end
+end
+
 return utils

@@ -1,5 +1,7 @@
 local utils = require 'renamer.utils'
 
+local stub = require 'luassert.stub'
+
 local eq = assert.are.same
 
 describe('utils', function()
@@ -77,6 +79,130 @@ describe('utils', function()
 
             eq(expected_word_start2, word_start)
             eq(expected_word_end2, word_end)
+        end)
+    end)
+
+    describe('set_qf_list', function()
+        it('should not set the quickfix list if changes are nil', function()
+            local setqflist = stub(vim.fn, 'setqflist')
+
+            utils.set_qf_list(nil)
+
+            assert.spy(setqflist).called_less_than(1)
+            setqflist.revert(setqflist)
+        end)
+
+        it('should not set the quickfix list if no files were modified', function()
+            local setqflist = stub(vim.fn, 'setqflist')
+
+            utils.set_qf_list {}
+
+            assert.spy(setqflist).called_less_than(1)
+            setqflist.revert(setqflist)
+        end)
+
+        it('should not set the quickfix list if files have no changes', function()
+            local changes = {
+                ['file:///test'] = {},
+            }
+            local get_buf_id = nil
+            if vim.uri and vim.uri.uri_to_bufnr then
+                get_buf_id = stub(vim.uri, 'uri_to_bufnr')
+            else
+                get_buf_id = stub(vim.fn, 'bufadd')
+            end
+            local buf_load = stub(vim.fn, 'bufload')
+            local setqflist = stub(vim.fn, 'setqflist')
+
+            utils.set_qf_list(changes)
+
+            assert.spy(get_buf_id).was_called()
+            assert.spy(buf_load).was_called()
+            assert.spy(setqflist).called_less_than(1)
+            setqflist.revert(setqflist)
+        end)
+
+        it('should set the quickfix list with the lines that were changed', function()
+            local changes = {
+                ['file:///test1'] = {
+                    {
+                        range = {
+                            start = {
+                                line = 0,
+                                character = 1,
+                            },
+                        },
+                    },
+                    {
+                        range = {
+                            start = {
+                                line = 0,
+                                character = 2,
+                            },
+                        },
+                    },
+                },
+                ['file:///test2'] = {
+                    {
+                        range = {
+                            start = {
+                                line = 2,
+                                character = 1,
+                            },
+                        },
+                    },
+                    {
+                        range = {
+                            start = {
+                                line = 2,
+                                character = 2,
+                            },
+                        },
+                    },
+                },
+            }
+            local expected_qf_list = {}
+            local pos = 0
+            for file, data in pairs(changes) do
+                for _, change in ipairs(data) do
+                    pos = pos + 1
+                    local row, col = change.range.start.line, change.range.start.character
+                    if row == 0 then
+                        row = 1
+                    end
+                    expected_qf_list[1] = {
+                        text = 'test',
+                        filename = string.gsub(file, 'file://', ''),
+                        lnum = row,
+                        col = col,
+                    }
+                end
+            end
+            local get_buf_id = nil
+            if vim.uri and vim.uri.uri_to_bufnr then
+                get_buf_id = stub(vim.uri, 'uri_to_bufnr')
+            else
+                get_buf_id = stub(vim.fn, 'bufadd')
+            end
+            local buf_load = stub(vim.fn, 'bufload')
+            local i = 0
+            local buf_get_lines = stub(vim.api, 'nvim_buf_get_lines').invokes(function()
+                i = i + 1
+                return { 'test' }
+            end)
+            local setqflist = stub(vim.fn, 'setqflist').invokes(function(...)
+                assert(expected_qf_list, ...)
+            end)
+
+            utils.set_qf_list(changes)
+
+            assert.spy(get_buf_id).was_called()
+            assert.spy(buf_load).was_called()
+            assert.spy(buf_get_lines).called_at_least(i)
+            assert.spy(buf_get_lines).called_at_most(i)
+            get_buf_id.revert(get_buf_id)
+            buf_load.revert(buf_load)
+            setqflist.revert(setqflist)
         end)
     end)
 end)

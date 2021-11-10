@@ -13,6 +13,7 @@ local mappings = require 'renamer.mappings'
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
+--- @field public with_qf_list boolean
 --- @field private _buffers table
 local renamer = {}
 
@@ -38,6 +39,8 @@ local renamer = {}
 ---     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
 ---     -- Whether or not to highlight the current word references through LSP
 ---     show_refs = true,
+---     -- Whether or not to add resulting changes to the quickfix list
+---     with_qf_list = true,
 ---     -- The keymaps available while in the `renamer` buffer. The example below
 ---     -- overrides the default values, but you can add others as well.
 ---     mappings = {
@@ -67,6 +70,7 @@ function renamer.setup(opts)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
+    renamer.with_qf_list = utils.get_value_or_default(opts, 'with_qf_list', defaults.with_qf_list)
     mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
 
     renamer._buffers = {}
@@ -317,7 +321,6 @@ function renamer._lsp_rename(word, pos)
                 log.error(err)
                 return
             end
-
             if not resp then
                 log.warn 'LSP response is nil.'
                 return
@@ -325,6 +328,9 @@ function renamer._lsp_rename(word, pos)
 
             lsp_utils.apply_workspace_edit(resp)
 
+            if renamer.with_qf_list then
+                utils.set_qf_list(resp.changes)
+            end
             if pos then
                 local col = pos.word_start + #word - 1
                 local mode = vim.api.nvim_get_mode().mode

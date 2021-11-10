@@ -14,6 +14,7 @@ describe('defaults', function()
             border = true,
             border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
             show_refs = true,
+            with_qf_list = true,
             mappings = mappings.bindings,
         }
 

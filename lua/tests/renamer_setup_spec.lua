@@ -15,6 +15,7 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -32,6 +33,7 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -54,6 +56,7 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -71,6 +74,7 @@ describe('renamer', function()
             eq(opts.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -88,6 +92,7 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(opts.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -95,7 +100,7 @@ describe('renamer', function()
         it('should use defaults where no options are passed ("show_refs" passed)', function()
             local mappings = require 'renamer.mappings'
             local opts = {
-                show_refs = true,
+                show_refs = false,
             }
 
             renamer.setup(opts)
@@ -105,6 +110,25 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(opts.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
+            eq(defaults.mappings, mappings.bindings)
+            eq({}, renamer._buffers)
+        end)
+
+        it('should use defaults where no options are passed ("with_qf_list" passed)', function()
+            local mappings = require 'renamer.mappings'
+            local opts = {
+                with_qf_list = false,
+            }
+
+            renamer.setup(opts)
+
+            eq(defaults.title, renamer.title)
+            eq(defaults.padding, renamer.padding)
+            eq(defaults.border, renamer.border)
+            eq(defaults.border_chars, renamer.border_chars)
+            eq(defaults.show_refs, renamer.show_refs)
+            eq(opts.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -124,6 +148,7 @@ describe('renamer', function()
             eq(defaults.border, renamer.border)
             eq(defaults.border_chars, renamer.border_chars)
             eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(opts.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)
@@ -141,6 +166,7 @@ describe('renamer', function()
                 border = false,
                 border_chars = { '═', '║', '═', '║', '╔', '╗', '╝', '╚' },
                 show_refs = false,
+                with_qf_list = false,
                 mappings = {
                     ['<c-a>'] = 'test',
                 },
@@ -153,6 +179,7 @@ describe('renamer', function()
             eq(opts.border, renamer.border)
             eq(opts.border_chars, renamer.border_chars)
             eq(opts.show_refs, renamer.show_refs)
+            eq(opts.with_qf_list, renamer.with_qf_list)
             eq(opts.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)

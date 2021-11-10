@@ -6,6 +6,7 @@ local mappings = require 'renamer.mappings'
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
+--- @field public with_qf_list boolean
 --- @field public mappings string
 local defaults = {
     -- The popup title, shown if `border` is true
@@ -23,6 +24,8 @@ local defaults = {
     border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
     -- Whether or not to highlight the current word references through LSP
     show_refs = true,
+    -- Whether or not to add resulting changes to the quickfix list
+    with_qf_list = true,
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
     mappings = mappings.bindings,
