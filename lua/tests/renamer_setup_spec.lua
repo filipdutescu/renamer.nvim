@@ -167,6 +167,7 @@ describe('renamer', function()
                 border_chars = { '═', '║', '═', '║', '╔', '╗', '╝', '╚' },
                 show_refs = false,
                 with_qf_list = false,
+                with_popup = false,
                 mappings = {
                     ['<c-a>'] = 'test',
                 },
@@ -180,6 +181,7 @@ describe('renamer', function()
             eq(opts.border_chars, renamer.border_chars)
             eq(opts.show_refs, renamer.show_refs)
             eq(opts.with_qf_list, renamer.with_qf_list)
+            eq(opts.with_popup, renamer.with_popup)
             eq(opts.mappings, mappings.bindings)
             eq({}, renamer._buffers)
         end)

@@ -7,6 +7,7 @@ local mappings = require 'renamer.mappings'
 --- @field public border_chars string[]
 --- @field public show_refs boolean
 --- @field public with_qf_list boolean
+--- @field public with_popup boolean
 --- @field public mappings string
 local defaults = {
     -- The popup title, shown if `border` is true
@@ -26,6 +27,9 @@ local defaults = {
     show_refs = true,
     -- Whether or not to add resulting changes to the quickfix list
     with_qf_list = true,
+    -- Whether or not to enter the new name through the UI or Neovim's `input`
+    -- prompt
+    with_popup = true,
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
     mappings = mappings.bindings,

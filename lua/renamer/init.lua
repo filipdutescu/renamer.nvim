@@ -14,6 +14,8 @@ local mappings = require 'renamer.mappings'
 --- @field public border_chars string[]
 --- @field public show_refs boolean
 --- @field public with_qf_list boolean
+--- @field public with_popup boolean
+--- @field public bindings table
 --- @field private _buffers table
 local renamer = {}
 
@@ -41,6 +43,9 @@ local renamer = {}
 ---     show_refs = true,
 ---     -- Whether or not to add resulting changes to the quickfix list
 ---     with_qf_list = true,
+---     -- Whether or not to enter the new name through the UI or Neovim's `input`
+---     -- prompt
+---     with_popup = true,
 ---     -- The keymaps available while in the `renamer` buffer. The example below
 ---     -- overrides the default values, but you can add others as well.
 ---     mappings = {
@@ -71,6 +76,7 @@ function renamer.setup(opts)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
     renamer.with_qf_list = utils.get_value_or_default(opts, 'with_qf_list', defaults.with_qf_list)
+    renamer.with_popup = utils.get_value_or_default(opts, 'with_popup', defaults.with_popup)
     mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
 
     renamer._buffers = {}
@@ -91,9 +97,9 @@ end
 --- @return integer prompt_window_id
 --- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename()
+    local cword = vim.fn.expand '<cword>'
     local win_height = vim.api.nvim_win_get_height(0)
     local win_width = vim.api.nvim_win_get_width(0)
-    local cword = vim.fn.expand '<cword>'
     local popup_opts = renamer._create_default_popup_opts(cword)
     local padding_top_bottom = renamer.padding.top + renamer.padding.bottom
     local padding_left_right = renamer.padding.left + renamer.padding.right
@@ -101,13 +107,6 @@ function renamer.rename()
         or not (renamer.border == true) and win_height < 2 + padding_top_bottom
     local is_width_too_short = renamer.border == true and win_width < popup_opts.minwidth + 2 + padding_left_right
         or not (renamer.border == true) and win_width < popup_opts.minwidth + padding_left_right
-
-    if is_height_too_short or is_width_too_short then
-        log.error 'Window does not provide enough space for the popup to be drawn.'
-        renamer._nvim_lsp_rename()
-        return
-    end
-
     local line, col = renamer._get_cursor()
     local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
@@ -143,6 +142,16 @@ function renamer.rename()
         col = col,
         line = line,
     }
+
+    if is_height_too_short or is_width_too_short or renamer.with_popup == false then
+        if is_height_too_short or is_width_too_short then
+            log.error 'Window does not provide enough space for the popup to be drawn.'
+        end
+
+        renamer._input_lsp_rename(cword, popup_opts.initial_pos)
+        renamer._clear_references()
+        return
+    end
     local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
 
     renamer._buffers[prompt_win_id] = {
@@ -302,8 +311,12 @@ function renamer._delete_autocmds()
     vim.cmd [[augroup end]]
 end
 
-function renamer._nvim_lsp_rename()
-    vim.lsp.buf.rename()
+function renamer._input_lsp_rename(cword, position)
+    local new_word = vim.fn.input(string.format('Rename "%s" to: ', cword))
+
+    if new_word and not (new_word == '') then
+        renamer._lsp_rename(new_word, position)
+    end
 end
 
 function renamer._lsp_rename(word, pos)
