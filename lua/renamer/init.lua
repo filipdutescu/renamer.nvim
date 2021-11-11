@@ -84,7 +84,7 @@ function renamer.setup(opts)
 end
 
 --- Function that renames the word under the cursor, using Neovim's built in
---- LSP feature (`vim.lsp.buf.rename()`). Creates a popup next to the cursor,
+--- LSP features (`vim.lsp.buf_request()`). Creates a popup next to the cursor,
 --- starting at the beginning of the word.
 ---
 --- The popup is drawn below the current line, if there is enough space,
@@ -94,9 +94,19 @@ end
 --- <code>
 --- require('renamer').rename()
 --- </code>
+---
+--- To rename without having the existing name in the popup, use the following:
+---
+--- <code>
+--- require('renamer').rename {
+---     empty = true,
+--- }
+--- </code>
+--- @param opts table Rename specific options (ie: `empty`).
 --- @return integer prompt_window_id
 --- @return table prompt_window_opts @Keys: opts, border_opts
-function renamer.rename()
+function renamer.rename(opts)
+    opts = opts or { empty = false }
     local cword = vim.fn.expand '<cword>'
     local win_height = vim.api.nvim_win_get_height(0)
     local win_width = vim.api.nvim_win_get_width(0)
@@ -152,7 +162,12 @@ function renamer.rename()
         renamer._clear_references()
         return
     end
-    local prompt_win_id, prompt_opts = popup.create(cword, popup_opts)
+
+    local popup_content = cword
+    if opts.empty == true then
+        popup_content = ''
+    end
+    local prompt_win_id, prompt_opts = popup.create(popup_content, popup_opts)
 
     renamer._buffers[prompt_win_id] = {
         opts = popup_opts,

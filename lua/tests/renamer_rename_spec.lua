@@ -452,5 +452,84 @@ describe('renamer', function()
             mock.revert(api_mock)
             document_highlight.revert(document_highlight)
         end)
+
+        it('should default to "empty" being `false` if not specified', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_get_mode.returns {}
+            api_mock.nvim_win_get_width.returns(100)
+            api_mock.nvim_win_get_height.returns(10)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
+            local expected_word = 'test'
+            local expand = stub(vim.fn, 'expand').returns(expected_word)
+            local document_highlight = stub(renamer, '_document_highlight')
+            local word = ''
+            stub(popup, 'create').invokes(function(...)
+                word, _ = ...
+                return 1, {}
+            end)
+
+            renamer.rename()
+
+            eq(expected_word, word)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+            expand.revert(expand)
+        end)
+
+        it('should default to "empty" being `false` if nil', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_get_mode.returns {}
+            api_mock.nvim_win_get_width.returns(100)
+            api_mock.nvim_win_get_height.returns(10)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
+            local expected_word = 'test'
+            local document_highlight = stub(renamer, '_document_highlight')
+            local word = ''
+            stub(popup, 'create').invokes(function(...)
+                word, _ = ...
+                return 1, {}
+            end)
+
+            renamer.rename {}
+
+            eq(expected_word, word)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+        end)
+
+        it('should be empty if "empty" is `true`', function()
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns { 1, 2 }
+            api_mock.nvim_command.returns()
+            api_mock.nvim_buf_line_count.returns(1)
+            api_mock.nvim_get_mode.returns {}
+            api_mock.nvim_win_get_width.returns(100)
+            api_mock.nvim_win_get_height.returns(10)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
+            local document_highlight = stub(renamer, '_document_highlight')
+            local expected_word = ''
+            local word = 'test'
+            stub(popup, 'create').invokes(function(...)
+                word, _ = ...
+                return 1, {}
+            end)
+
+            renamer.rename {
+                empty = true,
+            }
+
+            eq(expected_word, word)
+            mock.revert(api_mock)
+            document_highlight.revert(document_highlight)
+        end)
     end)
 end)

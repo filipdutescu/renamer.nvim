@@ -70,7 +70,7 @@ renamer.setup({opts})
 
 
     Parameters: ~
-        {opts} (table)  options to pass to the setup function
+        {opts}          (table)     options to pass to the setup function
 
     Fields: ~
         {title}         (string)    title of the popup, shown on the top border
@@ -112,17 +112,33 @@ renamer.setup({opts})
 ===============================================================================
                                                              *renamer.rename()*
 
-renamer.rename()
-   Function that renames the word under the cursor, using Neovim's built in
-   LSP feature (see |vim.lsp.buf.rename()|). Creates a popup next to the
-   cursor, starting at the beginning of the word.
+renamer.rename({opts})
+    Function that renames the word under the cursor, using Neovim's built in
+    LSP features (see |vim.lsp.buf_request()|). Creates a popup next to the
+    cursor, starting at the beginning of the word.
 
-   The popup is drawn below the current line, if there is enough space,
-   otherwise on the one above it.
+    The popup is drawn below the current line, if there is enough space,
+    otherwise on the one above it.
 
-   Usage:
-   >
-   require('renamer').rename()
+    Usage:
+    >
+    require('renamer').rename()
+<
+    To rename without having the existing name in the popup, use the following:
+    >
+    require('renamer').rename {
+        empty = true,
+    }
+<
+
+
+    Parameters: ~
+        {opts}      (table)     options to pass to the rename function
+
+    Fields: ~
+        {empty}     (boolean)   defines whether or not the popup should
+                                contain the initial word or be empty
+                                (default: true)
 
 
 

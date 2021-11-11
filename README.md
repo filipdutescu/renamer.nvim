@@ -168,7 +168,17 @@ current document, using `vim.lsp.buf.document_highlight()`. In order for it to
 be visible, the `LspReferenceText`, `LspReferenceRead` and `LspReferenceWrite`
 highlight groups need to be defined (see the
 [`vim.lsp.buf.document_highlight()`](https://neovim.io/doc/user/lsp.html#vim.lsp.buf.document_highlight())
- documentation for details).
+documentation for details).
+
+### Renamer rename structure
+
+```lua
+require('renamer').rename {
+    -- Defines whether or not the popup should contain the initial word or be
+    -- empty
+    empty = false,
+}
+```
 
 ## Default mappings
 
@@ -216,7 +226,8 @@ or no border:
 
 ![no-popup](media/renamer_no_popup.png "No popup")
 
-Thanks @sdushantha for suggesting this (and providing the screenshot)!
+Thanks [@sdushantha](https://github.com/sdushantha) for suggesting this (and
+providing the screenshot)!
 
 ## Contributing
 
