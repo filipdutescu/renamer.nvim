@@ -212,6 +212,12 @@ or no border:
 
 ![no-title](media/renamer_no_title.png "No title")
 
+- **No popup:**
+
+![no-popup](media/renamer_no_popup.png "No popup")
+
+Thanks @sdushantha for suggesting this (and providing the screenshot)!
+
 ## Contributing
 
 All contributions are welcome! Just open a pull request or an issue. Please read
