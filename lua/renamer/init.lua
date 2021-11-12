@@ -173,6 +173,7 @@ function renamer.rename(opts)
         opts = popup_opts,
         border_opts = prompt_opts.border,
     }
+    renamer._set_cursor_to_popup_end()
     log.fmt_info('Created "plenary" popup, with options: %s', vim.inspect(renamer._buffers[prompt_win_id]))
 
     renamer._setup_window(prompt_win_id)
@@ -260,6 +261,16 @@ function renamer._get_cursor()
     local cursor = vim.api.nvim_win_get_cursor(0)
 
     return cursor[1], cursor[2]
+end
+
+function renamer._set_cursor_to_popup_end()
+    local popup_win_content = vim.api.nvim_buf_get_lines(0, -2, -1, true)
+    local cursor_line, cursor_col = #popup_win_content, #popup_win_content[#popup_win_content]
+
+    cursor_line = cursor_line + renamer.padding.top
+    cursor_col = cursor_col - renamer.padding.right
+
+    vim.api.nvim_win_set_cursor(0, { cursor_line, cursor_col })
 end
 
 function renamer._setup_window(prompt_win_id)
