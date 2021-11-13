@@ -173,10 +173,10 @@ function renamer.rename(opts)
         opts = popup_opts,
         border_opts = prompt_opts.border,
     }
-    renamer._set_cursor_to_popup_end()
     log.fmt_info('Created "plenary" popup, with options: %s', vim.inspect(renamer._buffers[prompt_win_id]))
 
     renamer._setup_window(prompt_win_id)
+    renamer._set_cursor_to_popup_end()
     log.trace 'Finished setting up the popup.'
     renamer._set_prompt_win_style(prompt_win_id)
     log.trace 'Finished styling the popup.'
