@@ -1,3 +1,37 @@
+# [2.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v1.0.0...v2.0.0) (2021-11-13)
+
+
+### Bug Fixes
+
+* **qflist:** first line in file was not set correctly ([2f9e66b](https://github.com/filipdutescu/renamer.nvim/commit/2f9e66b12cc115c3c8ad3aac360fb94d76f60bce)), closes [#79](https://github.com/filipdutescu/renamer.nvim/issues/79)
+* **rename:** cursor placement at word end ([37c27fa](https://github.com/filipdutescu/renamer.nvim/commit/37c27fa77571ba9a81d06e148500fad9638bbe42)), closes [#73](https://github.com/filipdutescu/renamer.nvim/issues/73)
+
+
+* fix(rename)!: cursor is not placed at the end of the initial word ([a20b471](https://github.com/filipdutescu/renamer.nvim/commit/a20b471c9be59445ddd21d16885a567790dca147)), closes [#73](https://github.com/filipdutescu/renamer.nvim/issues/73)
+* feat(rename)!: add option for empty popup ([8f3d886](https://github.com/filipdutescu/renamer.nvim/commit/8f3d8864f22d118f4be886ed1c5fa94ec484784d)), closes [#71](https://github.com/filipdutescu/renamer.nvim/issues/71)
+* feat!: add `with_popup` to enable/disable popup ([4ef89d5](https://github.com/filipdutescu/renamer.nvim/commit/4ef89d5057b5d89a7701bd1272dccd2aaabe912c)), closes [#68](https://github.com/filipdutescu/renamer.nvim/issues/68)
+* feat(quickfix-list)!: add changes to qf list ([c88a70a](https://github.com/filipdutescu/renamer.nvim/commit/c88a70a917d99dbb49d6cf57477bfe469ea7067c)), closes [#69](https://github.com/filipdutescu/renamer.nvim/issues/69)
+
+
+### BREAKING CHANGES
+
+* Set the cursor to the end of the word inside the popup,
+taking into account padding, as oposed to placing it at the start of the
+popup.
+* Add options to `rename()` to allow for the
+popup to be empty or contain the initial word.
+* Fallback when popup is disabled/not able to be drawn
+changed from `vim.lsp.buf.rename()` to using `vim.fn.input()` to ask the
+user for input. This is required for:
+
+- setting the quickfix list with the resulting changes
+- preserving non-GUI input alternative, since Neovim 0.5.2+ will have
+  its own interface for `vim.lsp.buf.rename()`
+* Add rename changes to the quickfix list, conditioned
+by a new setup parameter. Update docs to describe the new parameter.
+
+
+
 # [1.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v0.3.0...v1.0.0) (2021-11-08)
 
 
