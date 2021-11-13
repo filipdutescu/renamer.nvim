@@ -59,9 +59,6 @@ function utils.set_qf_list(changes)
 
             for _, change in ipairs(data) do
                 local row, col = change.range.start.line, change.range.start.character
-                if row == 0 then
-                    row = 1
-                end
                 i = i + 1
                 local line = vim.api.nvim_buf_get_lines(buf_id, row, row + 1, false)
                 qf_list[i] = {

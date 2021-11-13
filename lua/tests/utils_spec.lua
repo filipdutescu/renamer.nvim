@@ -167,9 +167,6 @@ describe('utils', function()
                 for _, change in ipairs(data) do
                     pos = pos + 1
                     local row, col = change.range.start.line, change.range.start.character
-                    if row == 0 then
-                        row = 1
-                    end
                     expected_qf_list[1] = {
                         text = 'test',
                         filename = string.gsub(file, 'file://', ''),
@@ -190,12 +187,30 @@ describe('utils', function()
                 i = i + 1
                 return { 'test' }
             end)
+            local received_qf_list = nil
+            local is_same_entry = function(a, b)
+                return a.text == b.text and a.filename == b.filename and a.lnum == b.lnum and a.col == b.col
+            end
             local setqflist = stub(vim.fn, 'setqflist').invokes(function(...)
-                assert(expected_qf_list, ...)
+                received_qf_list = ...
             end)
 
             utils.set_qf_list(changes)
 
+            for _, exp_entry in ipairs(expected_qf_list) do
+                local found_entry = false
+                for _, entry in ipairs(received_qf_list) do
+                    if is_same_entry(exp_entry, entry) == true then
+                        found_entry = true
+                    end
+                end
+                if found_entry == false then
+                    assert(
+                        false,
+                        string.format('Did not find %s in %s.', vim.inspect(exp_entry), vim.inspect(received_qf_list))
+                    )
+                end
+            end
             assert.spy(get_buf_id).was_called()
             assert.spy(buf_load).was_called()
             assert.spy(buf_get_lines).called_at_least(i)
