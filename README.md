@@ -126,7 +126,7 @@ require('renamer').setup {
         left = 0,
         bottom = 0,
         right = 0,
-    }
+    },
     -- Whether or not to shown a border around the popup
     border = true,
     -- The characters which make up the border
