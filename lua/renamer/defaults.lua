@@ -9,6 +9,7 @@ local mappings = require 'renamer.mappings'
 --- @field public with_qf_list boolean
 --- @field public with_popup boolean
 --- @field public mappings string
+--- @field public handler function
 local defaults = {
     -- The popup title, shown if `border` is true
     title = 'Rename',
@@ -32,7 +33,10 @@ local defaults = {
     with_popup = true,
     -- The keymaps available while in the `renamer` buffer. The example below
     -- overrides the default values, but you can add others as well.
-    mappings = mappings.bindings,
+    mappings = mappings.default_bindings,
+    -- Custom handler to be run after successfully renaming the word. Receives
+    -- the LSP 'textDocument/rename' raw response as its parameter.
+    handler = nil,
 }
 
 return defaults

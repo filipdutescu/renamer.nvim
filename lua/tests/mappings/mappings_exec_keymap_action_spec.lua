@@ -8,8 +8,9 @@ describe('mappings', function()
     describe('exec_keymap_action', function()
         it('should not execute if `keymap` is nil', function()
             local binding = '<c-a>'
-            local initial_action = mappings.bindings[binding]
+            local initial_action = mappings.default_bindings[binding]
             local was_called = false
+            mappings.bindings = {}
             mappings.bindings[binding] = function()
                 was_called = true
             end
@@ -22,8 +23,9 @@ describe('mappings', function()
 
         it('should execute the action associated with a valid binding', function()
             local binding = '<c-a>'
-            local initial_action = mappings.bindings[binding]
+            local initial_action = mappings.default_bindings[binding]
             local was_called = false
+            mappings.bindings = {}
             mappings.bindings[binding] = function()
                 was_called = true
             end

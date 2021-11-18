@@ -15,31 +15,28 @@ describe('mappings', function()
         it('should not set keymaps if `bindings` is nil', function()
             local buf_id = 1
             local set_keymap = stub(vim.api, 'nvim_buf_set_keymap')
-            local initial_bindings = mappings.bindings
             mappings.bindings = nil
 
             mappings.register_bindings(buf_id)
 
             assert.spy(set_keymap).called_less_than(1)
-            mappings.bindings = initial_bindings
         end)
 
         it('should not set keymaps if `bindings` is empty', function()
             local buf_id = 1
             local set_keymap = stub(vim.api, 'nvim_buf_set_keymap')
-            local initial_bindings = mappings.bindings
             mappings.bindings = {}
 
             mappings.register_bindings(buf_id)
 
             assert.spy(set_keymap).called_less_than(1)
-            mappings.bindings = initial_bindings
         end)
 
         it('should set `bindings` as keymaps for the received buffer', function()
             local buf_id = 1
             local set_keymap = stub(vim.api, 'nvim_buf_set_keymap')
-            local bindings = mappings.bindings
+            local bindings = mappings.default_bindings
+            mappings.bindings = bindings
 
             mappings.register_bindings(buf_id)
 

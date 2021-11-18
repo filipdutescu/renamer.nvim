@@ -16,6 +16,7 @@ local mappings = require 'renamer.mappings'
 --- @field public with_qf_list boolean
 --- @field public with_popup boolean
 --- @field public bindings table
+--- @field public handler function
 --- @field private _buffers table
 local renamer = {}
 
@@ -57,6 +58,9 @@ local renamer = {}
 ---         ['<c-u>'] = require('renamer.mappings.utils').undo,
 ---         ['<c-r>'] = require('renamer.mappings.utils').redo,
 ---     },
+---     -- Custom handler to be run after successfully renaming the word. Receives
+---     -- the LSP 'textDocument/rename' raw response as its parameter.
+---     handler = nil,
 --- }
 --- </code>
 --- @param opts Defaults Configuration options, see `renamer.defaults`.
@@ -77,7 +81,10 @@ function renamer.setup(opts)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
     renamer.with_qf_list = utils.get_value_or_default(opts, 'with_qf_list', defaults.with_qf_list)
     renamer.with_popup = utils.get_value_or_default(opts, 'with_popup', defaults.with_popup)
-    mappings.bindings = utils.get_value_or_default(opts, 'mappings', mappings.bindings)
+    mappings.bindings = utils.get_value_or_default(opts, 'mappings', defaults.mappings)
+    if opts.handler and type(opts.handler) == 'function' then
+        renamer.handler = opts.handler
+    end
 
     renamer._buffers = {}
     log.info 'Finished setup.'
@@ -377,6 +384,9 @@ function renamer._lsp_rename(word, pos)
                     col = col - 1
                 end
                 vim.api.nvim_win_set_cursor(0, { pos.line, col })
+            end
+            if renamer.handler then
+                renamer.handler(resp)
             end
         end)
     end)

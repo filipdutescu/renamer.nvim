@@ -4,7 +4,7 @@ local eq = assert.are.same
 
 describe('mappings', function()
     it('should have actions initialized for all `bindings`', function()
-        local bindings = mappings.bindings
+        local bindings = mappings.default_bindings
 
         for key, value in pairs(bindings) do
             assert(value, string.format('No action mapped to "%s".', key))

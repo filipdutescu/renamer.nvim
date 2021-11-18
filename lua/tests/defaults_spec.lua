@@ -16,7 +16,8 @@ describe('defaults', function()
             show_refs = true,
             with_qf_list = true,
             with_popup = true,
-            mappings = mappings.bindings,
+            mappings = mappings.default_bindings,
+            handler = nil,
         }
 
         local defaults = require 'renamer.defaults'

@@ -17,6 +17,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -35,6 +36,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -58,6 +60,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -76,6 +79,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -94,6 +98,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -112,6 +117,7 @@ describe('renamer', function()
             eq(opts.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -130,6 +136,7 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(opts.with_qf_list, renamer.with_qf_list)
             eq(defaults.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -150,6 +157,28 @@ describe('renamer', function()
             eq(defaults.show_refs, renamer.show_refs)
             eq(defaults.with_qf_list, renamer.with_qf_list)
             eq(opts.mappings, mappings.bindings)
+            eq(defaults.handler, renamer.handler)
+            eq({}, renamer._buffers)
+        end)
+
+        it('should use defaults where no options are passed ("handler" passed)', function()
+            local mappings = require 'renamer.mappings'
+            local opts = {
+                handler = function(resp)
+                    print(resp)
+                end,
+            }
+
+            renamer.setup(opts)
+
+            eq(defaults.title, renamer.title)
+            eq(defaults.padding, renamer.padding)
+            eq(defaults.border, renamer.border)
+            eq(defaults.border_chars, renamer.border_chars)
+            eq(defaults.show_refs, renamer.show_refs)
+            eq(defaults.with_qf_list, renamer.with_qf_list)
+            eq(defaults.mappings, mappings.bindings)
+            eq(opts.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
 
@@ -171,6 +200,9 @@ describe('renamer', function()
                 mappings = {
                     ['<c-a>'] = 'test',
                 },
+                handler = function(resp)
+                    print(resp)
+                end,
             }
 
             renamer.setup(opts)
@@ -183,6 +215,7 @@ describe('renamer', function()
             eq(opts.with_qf_list, renamer.with_qf_list)
             eq(opts.with_popup, renamer.with_popup)
             eq(opts.mappings, mappings.bindings)
+            eq(opts.handler, renamer.handler)
             eq({}, renamer._buffers)
         end)
     end)

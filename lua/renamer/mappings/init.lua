@@ -1,10 +1,10 @@
 local utils = require 'renamer.mappings.utils'
 
 --- @class Mappings
---- @field public bindings table
+--- @field public default_bindings table
 --- @field public keymap_opts table
 local mappings = {
-    bindings = {
+    default_bindings = {
         ['<c-i>'] = utils.set_cursor_to_start,
         ['<c-a>'] = utils.set_cursor_to_end,
         ['<c-e>'] = utils.set_cursor_to_word_end,

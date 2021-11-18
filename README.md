@@ -149,6 +149,9 @@ require('renamer').setup {
         ['<c-u>'] = mappings_utils.undo,
         ['<c-r>'] = mappings_utils.redo,
     },
+    -- Custom handler to be run after successfully renaming the word. Receives
+    -- the LSP 'textDocument/rename' raw response as its parameter.
+    handler = nil,
 }
 ```
 
