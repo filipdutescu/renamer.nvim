@@ -1,3 +1,17 @@
+# [3.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v2.0.0...v3.0.0) (2021-11-18)
+
+
+* feat!: add custom handler for successful renames ([09030b3](https://github.com/filipdutescu/renamer.nvim/commit/09030b3286b794ccf86251604e331d5fe66ad3e8)), closes [#84](https://github.com/filipdutescu/renamer.nvim/issues/84)
+
+
+### BREAKING CHANGES
+
+* Add a new field, `handler`, representing a function
+to be called after successful renames, with the LSP
+`textDocument/rename` raw response.
+
+
+
 # [2.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v1.0.0...v2.0.0) (2021-11-13)
 
 
