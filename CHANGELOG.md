@@ -1,3 +1,12 @@
+## [3.0.1](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.0...v3.0.1) (2021-11-20)
+
+
+### Bug Fixes
+
+* **rename:** handle `documentChanges` LSP response ([9341d33](https://github.com/filipdutescu/renamer.nvim/commit/9341d338dd025029a904ad32784f6bd31f37d2c8)), closes [#84](https://github.com/filipdutescu/renamer.nvim/issues/84)
+
+
+
 # [3.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v2.0.0...v3.0.0) (2021-11-18)
 
 
