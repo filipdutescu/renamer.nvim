@@ -371,6 +371,15 @@ function renamer._lsp_rename(word, pos)
                 log.warn 'LSP response is nil.'
                 return
             end
+            local changes = resp.changes
+            if resp.documentChanges then
+                changes = {}
+                for _, change in ipairs(resp.documentChanges) do
+                    changes[change.textDocument.uri] = {
+                        change.edits,
+                    }
+                end
+            end
 
             lsp_utils.apply_workspace_edit(resp)
 
