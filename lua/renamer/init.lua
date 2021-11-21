@@ -375,16 +375,14 @@ function renamer._lsp_rename(word, pos)
             if resp.documentChanges then
                 changes = {}
                 for _, change in ipairs(resp.documentChanges) do
-                    changes[change.textDocument.uri] = {
-                        change.edits,
-                    }
+                    changes[change.textDocument.uri] = change.edits
                 end
             end
 
             lsp_utils.apply_workspace_edit(resp)
 
             if renamer.with_qf_list then
-                utils.set_qf_list(resp.changes)
+                utils.set_qf_list(changes)
             end
             if pos then
                 local col = pos.word_start + #word - 1
