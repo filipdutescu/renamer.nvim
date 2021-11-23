@@ -198,6 +198,19 @@ to users and mimic the default behaviour of their normal mode equivalents.
 | `<c-u>`  | Undo changes.                |
 | `<c-r>`  | Redo undone changes.         |
 
+To change existing mappings or add new ones, the value needed to be passed in the
+mappings field is a Lua function. Here is an example of how to change `<c-c>`'s
+behaviour from clearing the line to closing the popup:
+
+```lua
+-- other setup code...
+
+['<c-c>'] = function()
+    vim.api.nvim_input('<esc>')
+end
+
+-- other setup code...
+```
 
 ## Media
 
