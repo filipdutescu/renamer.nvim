@@ -64,8 +64,8 @@ function utils.set_qf_list(changes)
                 qf_list[i] = {
                     text = line and line[1],
                     filename = file,
-                    lnum = row,
-                    col = col,
+                    lnum = row + 1,
+                    col = col + 1,
                 }
             end
         end
