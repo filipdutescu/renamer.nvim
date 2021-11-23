@@ -170,8 +170,8 @@ describe('utils', function()
                     expected_qf_list[1] = {
                         text = 'test',
                         filename = string.gsub(file, 'file://', ''),
-                        lnum = row,
-                        col = col,
+                        lnum = row + 1,
+                        col = col + 1,
                     }
                 end
             end
