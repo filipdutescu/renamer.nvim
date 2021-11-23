@@ -1,3 +1,12 @@
+## [3.0.2](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.1...v3.0.2) (2021-11-23)
+
+
+### Bug Fixes
+
+* responses with `documentChanges` set qflist properly ([#90](https://github.com/filipdutescu/renamer.nvim/issues/90)) ([645e7bd](https://github.com/filipdutescu/renamer.nvim/commit/645e7bd7a18f017f05f1f5ccf54331a510c93652))
+
+
+
 ## [3.0.1](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.0...v3.0.1) (2021-11-20)
 
 
