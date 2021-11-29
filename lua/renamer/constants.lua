@@ -56,6 +56,7 @@ local strings = {
     checking_setup_called = 'Chechking whether setup was made...',
     setup_not_called = '"renamer.setup()" not called. Please make sure setup is done before using the plugin.',
     invalid_type_err_template = 'Invalid type for "%s". Expected "%s", but found "%s".',
+    no_lsp_client_found_err = 'No LSP client found for the current file, but "renamer" requires one to work.',
 }
 
 return {

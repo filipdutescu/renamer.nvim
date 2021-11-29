@@ -115,6 +115,12 @@ end
 --- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename(opts)
     opts = opts or { empty = false }
+
+    local lsp_clients = vim.lsp.buf_get_clients(0)
+    if lsp_clients == nil or #lsp_clients < 1 then
+        log.error(strings.no_lsp_client_found_err)
+    end
+
     local cword = vim.fn.expand(strings.cword_keyword)
     local win_height = vim.api.nvim_win_get_height(0)
     local win_width = vim.api.nvim_win_get_width(0)
@@ -368,7 +374,7 @@ function renamer._lsp_rename(word, pos)
                 log.error(err)
                 return
             end
-            if not resp then
+            if resp == nil then
                 log.warn(strings.nil_lsp_response_err)
                 return
             end
@@ -380,7 +386,7 @@ function renamer._lsp_rename(word, pos)
                 end
             end
 
-            lsp_utils.apply_workspace_edit(resp)
+            renamer._apply_workspace_edit(resp)
 
             if renamer.with_qf_list then
                 utils.set_qf_list(changes)
@@ -455,6 +461,10 @@ end
 -- Since there is no way to mock `vim.lsp.buf_request`, this function is used as a replacement
 function renamer._buf_request(buf_id, method, params, handler)
     vim.lsp.buf_request(buf_id, method, params, handler)
+end
+
+function renamer._apply_workspace_edit(resp)
+    lsp_utils.apply_workspace_edit(resp)
 end
 
 return renamer

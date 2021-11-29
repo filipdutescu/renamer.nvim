@@ -16,8 +16,32 @@ describe('renamer', function()
             renamer.setup()
         end)
 
+        it('should not allow renaming if no LSP client is attached to the current buffer (nil value)', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns(nil)
+            local create = stub(popup, 'create')
+
+            renamer.rename()
+
+            assert.spy(create).called_at_most(0)
+            mock.revert(lsp_mock)
+        end)
+
+        it('should not allow renaming if no LSP client is attached (less than 1 client)', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns {}
+            local create = stub(popup, 'create')
+
+            renamer.rename()
+
+            assert.spy(create).called_at_most(0)
+            mock.revert(lsp_mock)
+        end)
+
         it('should not allow renaming if word start is nil', function()
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -33,10 +57,13 @@ describe('renamer', function()
 
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
         end)
 
         it('should fallback to `vim.fn.input()` if width is too short (with border)', function()
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -60,6 +87,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -67,6 +95,8 @@ describe('renamer', function()
         it('should fallback to `vim.fn.input()` if width is too short (without border)', function()
             renamer.setup { border = false }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -90,12 +120,15 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should fallback to `vim.fn.input()` if height is too short (with border)', function()
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(3)
@@ -119,6 +152,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -126,6 +160,8 @@ describe('renamer', function()
         it('should fallback to `vim.fn.input()` if height is too short (without border)', function()
             renamer.setup { border = false }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(3)
@@ -149,6 +185,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -163,6 +200,8 @@ describe('renamer', function()
                 },
             }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -186,6 +225,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -201,6 +241,8 @@ describe('renamer', function()
                 },
             }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -224,6 +266,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -231,6 +274,8 @@ describe('renamer', function()
         it('should use `vim.fn.input()` if "with_popup" is `false`', function()
             renamer.setup { with_popup = false }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -254,6 +299,7 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -261,6 +307,8 @@ describe('renamer', function()
         it('should not rename if no input is received ("with_popup" is `true`)', function()
             renamer.setup { with_popup = false }
             local expected_cword = 'test'
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns()
             api_mock.nvim_win_get_height.returns(15)
@@ -283,12 +331,15 @@ describe('renamer', function()
             assert.spy(rename).called_at_most(0)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should call `utils.get_word_boundaries_in_line`', function()
             local expected_cword, expected_line, expected_col = 'test', 1, 2
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_command.returns()
             api_mock.nvim_win_get_cursor.returns { 1, expected_col }
@@ -308,11 +359,14 @@ describe('renamer', function()
 
             assert.spy(get_word_boundaries_in_line).was_called_with(expected_line, expected_cword, expected_col + 1)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should highlight references if `show_refs` is `true`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_command.returns()
             api_mock.nvim_buf_line_count.returns(1)
@@ -331,11 +385,14 @@ describe('renamer', function()
 
             assert.spy(document_highlight).was_called()
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should not highlight references if `show_refs` is not `true`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_command.returns()
             api_mock.nvim_buf_line_count.returns(1)
@@ -355,11 +412,14 @@ describe('renamer', function()
 
             assert.spy(document_highlight).called_less_than(1)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should call `_setup_window`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_command.returns()
             api_mock.nvim_buf_line_count.returns(1)
@@ -378,11 +438,14 @@ describe('renamer', function()
 
             assert.spy(setup_window).was_called()
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should call `_set_prompt_win_style`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -401,11 +464,14 @@ describe('renamer', function()
 
             assert.spy(set_prompt_win_style).was_called()
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should call `_create_autocmds`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -424,6 +490,7 @@ describe('renamer', function()
 
             assert.spy(create_autocms).was_called()
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -459,6 +526,8 @@ describe('renamer', function()
             }
             local expected_border_opts = {}
             local expected_buf_id = 123
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { expected_line_no, expected_col_no }
             api_mock.nvim_command.returns()
@@ -477,11 +546,14 @@ describe('renamer', function()
             eq(expected_opts, opts.opts)
             eq(expected_border_opts, opts.border_opts)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should call `mappings.register_bindings`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -501,11 +573,14 @@ describe('renamer', function()
 
             assert.spy(register_bindings).was_called()
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should default to "empty" being `false` if not specified', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -529,12 +604,15 @@ describe('renamer', function()
 
             eq(expected_word, word)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             expand.revert(expand)
             set_cursor.revert(set_cursor)
         end)
 
         it('should default to "empty" being `false` if nil', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -557,11 +635,14 @@ describe('renamer', function()
 
             eq(expected_word, word)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
 
         it('should be empty if "empty" is `true`', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -586,6 +667,7 @@ describe('renamer', function()
 
             eq(expected_word, word)
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
             set_cursor.revert(set_cursor)
         end)
@@ -593,6 +675,8 @@ describe('renamer', function()
         it('should set cursor to the end of the popup word (no padding)', function()
             local buf_line = 'abc'
             local expected_line, expected_col = 1, #buf_line
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -610,6 +694,7 @@ describe('renamer', function()
 
             assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_line, expected_col })
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
         end)
 
@@ -617,6 +702,8 @@ describe('renamer', function()
             local padding = { top = 4, left = 2, right = 2 }
             local buf_line = '  abc  '
             local expected_line, expected_col = 1 + padding.top, #buf_line - padding.right
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { {} }
             local api_mock = mock(vim.api, true)
             api_mock.nvim_win_get_cursor.returns { 1, 2 }
             api_mock.nvim_command.returns()
@@ -637,6 +724,7 @@ describe('renamer', function()
 
             assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_line, expected_col })
             mock.revert(api_mock)
+            mock.revert(lsp_mock)
             document_highlight.revert(document_highlight)
         end)
     end)

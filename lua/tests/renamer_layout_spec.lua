@@ -1,3 +1,4 @@
+local strings = require('renamer.constants').strings
 local renamer = require 'renamer'
 local utils = require 'renamer.utils'
 
@@ -17,6 +18,8 @@ describe('renamer', function()
                 local cursor_col, word_start, win_width = 15, 13, 20
                 local cword = 'test'
                 local expected_width = #cword
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -34,6 +37,7 @@ describe('renamer', function()
 
                 eq(expected_width, opts.opts.width)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 expand.revert(expand)
                 set_cursor.revert(set_cursor)
@@ -44,6 +48,8 @@ describe('renamer', function()
                 local cursor_col, word_start, win_width = 15, 13, 20
                 local cword = 'testing'
                 local expected_width = #cword
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -61,6 +67,7 @@ describe('renamer', function()
 
                 eq(expected_width, opts.opts.width)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 expand.revert(expand)
                 set_cursor.revert(set_cursor)
@@ -73,6 +80,8 @@ describe('renamer', function()
             end)
 
             it('should call `_set_prompt_border_win_style`', function()
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, 2 }
                 api_mock.nvim_command.returns()
@@ -90,6 +99,7 @@ describe('renamer', function()
 
                 assert.spy(set_prompt_border_win_style).was_called_with(1)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -97,7 +107,9 @@ describe('renamer', function()
             it('should use cursor line for line position if there is enough space below', function()
                 local cursor_line = 1
                 local expected_line_no = 2
-                local expected_line = 'cursor+' .. expected_line_no
+                local expected_line = strings.plenary_popup_cursor_plus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { cursor_line, 2 }
                 api_mock.nvim_command.returns()
@@ -114,13 +126,16 @@ describe('renamer', function()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
 
             it('should use flip line position if at the end of the screen', function()
                 local expected_line_no = 2
-                local expected_line = 'cursor-' .. expected_line_no
+                local expected_line = strings.plenary_popup_cursor_minus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, 2 }
                 api_mock.nvim_command.returns()
@@ -137,13 +152,16 @@ describe('renamer', function()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
 
             it('should set the column position at the begining of the cword (cursor column inside word)', function()
                 local expected_col_no = 2
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, expected_col_no + 1 }
                 api_mock.nvim_command.returns()
@@ -160,6 +178,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -167,7 +186,9 @@ describe('renamer', function()
             it('should set the column position at the begining of the cword (cursor column at word start)', function()
                 local cursor_col = 10
                 local expected_col_no = 1
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -184,6 +205,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -192,7 +214,9 @@ describe('renamer', function()
                 local cursor_col = 10
                 local word_start = 5
                 local expected_col_no = cursor_col - word_start + 1
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -209,6 +233,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -219,7 +244,9 @@ describe('renamer', function()
                 local win_width = 20
                 -- no `word_start` as the formula would have `... - word_start ... + word_start`
                 local expected_col_no = cursor_col + 1 + #renamer.title + 4 - win_width + 4
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -236,6 +263,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -249,7 +277,9 @@ describe('renamer', function()
             it('should use cursor line for line position if there is enough space below', function()
                 local cursor_line = 1
                 local expected_line_no = 1
-                local expected_line = 'cursor+' .. expected_line_no
+                local expected_line = strings.plenary_popup_cursor_plus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { cursor_line, 2 }
                 api_mock.nvim_command.returns()
@@ -266,13 +296,16 @@ describe('renamer', function()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
 
             it('should use flip line position if at the end of the screen', function()
                 local expected_line_no = 1
-                local expected_line = 'cursor-' .. expected_line_no
+                local expected_line = strings.plenary_popup_cursor_minus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, 2 }
                 api_mock.nvim_command.returns()
@@ -289,13 +322,16 @@ describe('renamer', function()
 
                 eq(expected_line, opts.opts.line)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
 
             it('should set the column position at the begining of the cword (cursor column inside word)', function()
                 local expected_col_no = 1
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, expected_col_no + 1 }
                 api_mock.nvim_command.returns()
@@ -312,6 +348,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -319,7 +356,9 @@ describe('renamer', function()
             it('should set the column position at the begining of the cword (cursor column at word start)', function()
                 local cursor_col = 10
                 local expected_col_no = 0
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -336,6 +375,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -344,7 +384,9 @@ describe('renamer', function()
                 local cursor_col = 10
                 local word_start = 5
                 local expected_col_no = cursor_col - word_start + 1
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -361,6 +403,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
@@ -371,7 +414,9 @@ describe('renamer', function()
                 local win_width = 20
                 -- no `word_start` as the formula would have `... - word_start ... + word_start`
                 local expected_col_no = cursor_col + 1 + #renamer.title + 4 - win_width
-                local expected_col = 'cursor-' .. expected_col_no
+                local expected_col = strings.plenary_popup_cursor_minus .. expected_col_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
                 api_mock.nvim_win_get_cursor.returns { 1, cursor_col }
                 api_mock.nvim_command.returns()
@@ -388,6 +433,7 @@ describe('renamer', function()
 
                 eq(expected_col, opts.opts.col)
                 mock.revert(api_mock)
+                mock.revert(lsp_mock)
                 document_highlight.revert(document_highlight)
                 set_cursor.revert(set_cursor)
             end)
