@@ -1,3 +1,13 @@
+## [3.0.3](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.2...v3.0.3) (2021-11-29)
+
+
+### Bug Fixes
+
+* popup showing when no LSP client attached ([1b98bae](https://github.com/filipdutescu/renamer.nvim/commit/1b98baedb0c37c196158842eb0acf70da1913f6a)), closes [#96](https://github.com/filipdutescu/renamer.nvim/issues/96)
+* various errors and logs ([dd25890](https://github.com/filipdutescu/renamer.nvim/commit/dd25890dde7922c34207b9dfd7fc9f737ff1c3ee)), closes [#95](https://github.com/filipdutescu/renamer.nvim/issues/95)
+
+
+
 ## [3.0.2](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.1...v3.0.2) (2021-11-23)
 
 
