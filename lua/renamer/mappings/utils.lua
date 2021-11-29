@@ -1,7 +1,9 @@
+local strings = require('renamer.constants').strings
+
 local utils = {}
 
 utils.exec_in_normal = function(callback, ...)
-    vim.api.nvim_command [[stopinsert]]
+    vim.api.nvim_command(strings.stopinsert_command)
     callback(...)
 end
 

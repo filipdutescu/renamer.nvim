@@ -1,5 +1,6 @@
+local strings = require('renamer.constants').strings
 local log = require('plenary.log').new {
-    plugin = 'renamer',
+    plugin = strings.plugin_name,
     level = 'warn',
 }
 local lsp_utils = require 'vim.lsp.util'
@@ -87,7 +88,7 @@ function renamer.setup(opts)
     end
 
     renamer._buffers = {}
-    log.info 'Finished setup.'
+    log.info(strings.finished_setup)
 end
 
 --- Function that renames the word under the cursor, using Neovim's built in
@@ -114,7 +115,7 @@ end
 --- @return table prompt_window_opts @Keys: opts, border_opts
 function renamer.rename(opts)
     opts = opts or { empty = false }
-    local cword = vim.fn.expand '<cword>'
+    local cword = vim.fn.expand(strings.cword_keyword)
     local win_height = vim.api.nvim_win_get_height(0)
     local win_width = vim.api.nvim_win_get_width(0)
     local popup_opts = renamer._create_default_popup_opts(cword)
@@ -126,6 +127,10 @@ function renamer.rename(opts)
         or not (renamer.border == true) and win_width < popup_opts.minwidth + padding_left_right
     local line, col = renamer._get_cursor()
     local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
+    if word_start == nil then
+        log.info(strings.invalid_cursor_position_err)
+        return
+    end
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
     local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
     local width = 0
@@ -152,8 +157,9 @@ function renamer.rename(opts)
     renamer._document_highlight()
 
     popup_opts.width = width
-    popup_opts.line = (prompt_line_no >= 0 and 'cursor+' or 'cursor') .. prompt_line_no
-    popup_opts.col = 'cursor-' .. prompt_col_no
+    popup_opts.line = (prompt_line_no >= 0 and strings.plenary_popup_cursor_plus or strings.plenary_popup_cursor)
+        .. prompt_line_no
+    popup_opts.col = strings.plenary_popup_cursor_minus .. prompt_col_no
     popup_opts.initial_pos = {
         word_start = word_start,
         col = col,
@@ -162,7 +168,7 @@ function renamer.rename(opts)
 
     if is_height_too_short or is_width_too_short or renamer.with_popup == false then
         if is_height_too_short or is_width_too_short then
-            log.error 'Window does not provide enough space for the popup to be drawn.'
+            log.error(strings.not_enough_space_err)
         end
 
         renamer._input_lsp_rename(cword, popup_opts.initial_pos)
@@ -180,13 +186,13 @@ function renamer.rename(opts)
         opts = popup_opts,
         border_opts = prompt_opts.border,
     }
-    log.fmt_info('Created "plenary" popup, with options: %s', vim.inspect(renamer._buffers[prompt_win_id]))
+    log.fmt_info(strings.created_popup_template, vim.inspect(renamer._buffers[prompt_win_id]))
 
     renamer._setup_window(prompt_win_id)
     renamer._set_cursor_to_popup_end()
-    log.trace 'Finished setting up the popup.'
+    log.trace(strings.finished_popup_setup)
     renamer._set_prompt_win_style(prompt_win_id)
-    log.trace 'Finished styling the popup.'
+    log.trace(strings.finished_popup_styling)
 
     return prompt_win_id, renamer._buffers[prompt_win_id]
 end
@@ -200,12 +206,12 @@ function renamer.on_submit(window_id)
 
         renamer._delete_autocmds()
         if not (new_word == '') then
-            log.fmt_info('Submitted word: "%s".', new_word)
+            log.fmt_info(strings.submitted_word_template, new_word)
             renamer.on_close(window_id, false)
             renamer._lsp_rename(new_word, pos)
         else
             renamer.on_close(window_id, true)
-            log.fmt_error('Cannot rename "%s" to and empty string.', opts.initial_word)
+            log.fmt_error(strings.rename_to_empty_string_err_template, opts.initial_word)
         end
     end
 end
@@ -220,18 +226,18 @@ function renamer.on_close(window_id, should_set_cursor_pos)
     local pos = settings and settings.opts and settings.opts.initial_pos
 
     renamer._delete_window(window_id)
-    log.fmt_info('Deleted window: "%s".', window_id)
+    log.fmt_info(strings.deleted_window_template, window_id)
     renamer._delete_window(border_win_id)
-    log.fmt_info('Deleted window: "%s" (border).', border_win_id)
+    log.fmt_info(strings.deleted_window_border_template, border_win_id)
 
     renamer._clear_references()
-    if initial_mode and not string.match(initial_mode, 'i') then
-        vim.api.nvim_command [[stopinsert]]
+    if initial_mode and not string.match(initial_mode, strings.insert_mode_short_string) then
+        vim.api.nvim_command(strings.stopinsert_command)
     end
 
     if should_set_cursor_pos and pos then
         local col = pos.col
-        if initial_mode and not string.match(initial_mode, 'i') then
+        if initial_mode and not string.match(initial_mode, strings.insert_mode_short_string) then
             col = col + 1
         end
         vim.api.nvim_win_set_cursor(0, { pos.line, col })
@@ -242,12 +248,12 @@ function renamer._create_default_popup_opts(cword)
     local p = renamer.padding
     return {
         title = renamer.title,
-        titlehighlight = 'RenamerTitle',
+        titlehighlight = strings.highlight_title,
         padding = { p.top, p.right, p.bottom, p.left },
         border = renamer.border,
         borderchars = renamer.border_chars,
-        highlight = 'RenamerNormal',
-        borderhighlight = 'RenamerBorder',
+        highlight = strings.highlight_normal,
+        borderhighlight = strings.highlight_border,
         minwidth = 15,
         maxwidth = 45,
         minheight = 1,
@@ -283,24 +289,24 @@ end
 function renamer._setup_window(prompt_win_id)
     local prompt_buf_id = vim.api.nvim_win_get_buf(prompt_win_id)
 
-    vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
-    vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
+    vim.api.nvim_win_set_option(prompt_win_id, strings.win_opt_wrap, false)
+    vim.api.nvim_win_set_option(prompt_win_id, strings.win_opt_winblend, 0)
 
-    vim.api.nvim_command [[startinsert]]
+    vim.api.nvim_command(strings.startinsert_command)
     renamer._create_autocmds(prompt_win_id)
 
     vim.api.nvim_buf_set_keymap(
         prompt_buf_id,
-        'i',
-        '<cr>',
-        "<cmd>lua require('renamer').on_submit(" .. prompt_win_id .. ')<cr>',
+        strings.insert_mode_short_string,
+        strings.cr_keyword,
+        string.format(strings.submit_key_press_command, prompt_win_id),
         { noremap = true }
     )
     vim.api.nvim_buf_set_keymap(
         prompt_buf_id,
-        'i',
-        '<esc>',
-        "<cmd>lua require('renamer').on_close(" .. prompt_win_id .. ')<cr>',
+        strings.insert_mode_short_string,
+        strings.esc_keyword,
+        string.format(strings.cancel_key_press_command, prompt_win_id),
         { noremap = true }
     )
     mappings.register_bindings(prompt_buf_id)
@@ -308,9 +314,6 @@ end
 
 function renamer._set_prompt_win_style(prompt_win_id)
     if prompt_win_id then
-        vim.api.nvim_win_set_option(prompt_win_id, 'wrap', false)
-        vim.api.nvim_win_set_option(prompt_win_id, 'winblend', 0)
-
         if renamer._buffers and renamer._buffers[prompt_win_id] then
             local opts = renamer._buffers[prompt_win_id]
             local border_win_id = opts.border_opts and opts.border_opts.win_id
@@ -322,30 +325,28 @@ end
 
 function renamer._set_prompt_border_win_style(prompt_border_win_id)
     if prompt_border_win_id then
-        vim.api.nvim_win_set_option(prompt_border_win_id, 'wrap', false)
-        vim.api.nvim_win_set_option(prompt_border_win_id, 'winblend', 0)
+        vim.api.nvim_win_set_option(prompt_border_win_id, strings.win_opt_wrap, false)
+        vim.api.nvim_win_set_option(prompt_border_win_id, strings.win_opt_winblend, 0)
     end
 end
 
 function renamer._create_autocmds(prompt_win_id)
-    local on_leave = string.format(
-        [[  autocmd BufLeave,WinLeave <buffer> ++nested ++once :silent lua require'renamer'.on_close(%s)]],
-        prompt_win_id
-    )
-    vim.cmd [[augroup RenamerInsert]]
-    vim.cmd [[  au!]]
+    local on_leave = string.format(strings.autocmd_buf_leave_template, prompt_win_id)
+
+    vim.cmd(strings.augroup_start)
+    vim.cmd(strings.augroup_reset)
     vim.cmd(on_leave)
-    vim.cmd [[augroup end]]
+    vim.cmd(strings.augroup_end)
 end
 
 function renamer._delete_autocmds()
-    vim.cmd [[augroup RenamerInsert]]
-    vim.cmd [[  au!]]
-    vim.cmd [[augroup end]]
+    vim.cmd(strings.augroup_start)
+    vim.cmd(strings.augroup_reset)
+    vim.cmd(strings.augroup_end)
 end
 
 function renamer._input_lsp_rename(cword, position)
-    local new_word = vim.fn.input(string.format('Rename "%s" to: ', cword))
+    local new_word = vim.fn.input(string.format(strings.input_prompt_template, cword))
 
     if new_word and not (new_word == '') then
         renamer._lsp_rename(new_word, position)
@@ -355,20 +356,20 @@ end
 function renamer._lsp_rename(word, pos)
     local params = renamer._make_position_params()
 
-    renamer._buf_request(0, 'textDocument/prepareRename', params, function(prep_err, prep_resp)
+    renamer._buf_request(0, strings.lsp_req_prepare_rename, params, function(prep_err, prep_resp)
         if prep_err == nil and prep_resp == nil then
-            log.warn 'Nothing to rename.'
+            log.warn(strings.nothing_to_rename_err)
             return
         end
         params.newName = word
 
-        renamer._buf_request(0, 'textDocument/rename', params, function(err, resp)
+        renamer._buf_request(0, strings.lsp_req_rename, params, function(err, resp)
             if err then
                 log.error(err)
                 return
             end
             if not resp then
-                log.warn 'LSP response is nil.'
+                log.warn(strings.nil_lsp_response_err)
                 return
             end
             local changes = resp.changes
@@ -387,7 +388,7 @@ function renamer._lsp_rename(word, pos)
             if pos then
                 local col = pos.word_start + #word - 1
                 local mode = vim.api.nvim_get_mode().mode
-                if mode and not string.match(mode, 'i') then
+                if mode and not string.match(mode, strings.insert_mode_short_string) then
                     col = col - 1
                 end
                 vim.api.nvim_win_set_cursor(0, { pos.line, col })
@@ -413,14 +414,18 @@ end
 function renamer._delete_window(win_id)
     if win_id and vim.api.nvim_win_is_valid(win_id) then
         local buf_id = vim.api.nvim_win_get_buf(win_id)
-        if buf_id and vim.api.nvim_buf_is_valid(buf_id) and not vim.api.nvim_buf_get_option(buf_id, 'buflisted') then
-            vim.api.nvim_command(string.format('silent! bdelete! %s', buf_id))
+        if
+            buf_id
+            and vim.api.nvim_buf_is_valid(buf_id)
+            and not vim.api.nvim_buf_get_option(buf_id, strings.buf_opt_buflisted)
+        then
+            vim.api.nvim_command(string.format(strings.buf_delete_command_template, buf_id))
         end
 
         if vim.api.nvim_win_is_valid(win_id) then
             vim.api.nvim_win_close(win_id, true)
             if not pcall(vim.api.nvim_win_close, win_id, true) then
-                log.trace('Failed to close window: rename_prompt_win/' .. win_id)
+                log.trace(string.format(strings.failed_to_close_window_err_template, win_id))
             end
         end
     end

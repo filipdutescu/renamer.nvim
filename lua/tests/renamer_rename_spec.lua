@@ -1,3 +1,4 @@
+local strings = require('renamer.constants').strings
 local renamer = require 'renamer'
 local utils = require 'renamer.utils'
 
@@ -13,6 +14,25 @@ describe('renamer', function()
     describe('rename', function()
         before_each(function()
             renamer.setup()
+        end)
+
+        it('should not allow renaming if word start is nil', function()
+            local expected_cword = 'test'
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_cursor.returns()
+            api_mock.nvim_win_get_height.returns(15)
+            api_mock.nvim_win_get_width.returns(2)
+            api_mock.nvim_get_mode.returns { mode = 'n' }
+            api_mock.nvim_win_get_cursor.returns { 1, 1 }
+            api_mock.nvim_buf_line_count.returns(10)
+            stub(vim.fn, 'expand').returns(expected_cword)
+            stub(utils, 'get_word_boundaries_in_line').returns(nil, nil)
+            local create = stub(popup, 'create')
+
+            renamer.rename()
+
+            assert.spy(create).called_at_most(0)
+            mock.revert(api_mock)
         end)
 
         it('should fallback to `vim.fn.input()` if width is too short (with border)', function()
@@ -35,7 +55,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -65,7 +85,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -94,7 +114,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -124,7 +144,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -161,7 +181,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -199,7 +219,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -229,7 +249,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_least(1)
             assert.spy(rename).called_at_most(1)
             assert.spy(create).called_at_most(0)
@@ -259,7 +279,7 @@ describe('renamer', function()
 
             renamer.rename()
 
-            assert.spy(input).was_called_with('Rename "' .. expected_cword .. '" to: ')
+            assert.spy(input).was_called_with(string.format(strings.input_prompt_template, expected_cword))
             assert.spy(rename).called_at_most(0)
             assert.spy(create).called_at_most(0)
             mock.revert(api_mock)
@@ -414,15 +434,15 @@ describe('renamer', function()
             local p = renamer.padding
             local expected_opts = {
                 title = renamer.title,
-                titlehighlight = 'RenamerTitle',
+                titlehighlight = strings.highlight_title,
                 padding = { p.top, p.right, p.bottom, p.left },
                 border = renamer.border,
                 borderchars = renamer.border_chars,
-                highlight = 'RenamerNormal',
-                borderhighlight = 'RenamerBorder',
+                highlight = strings.highlight_normal,
+                borderhighlight = strings.highlight_border,
                 width = #renamer.title + 4,
-                line = 'cursor+' .. expected_line_no,
-                col = 'cursor-' .. expected_col_no,
+                line = strings.plenary_popup_cursor_plus .. expected_line_no,
+                col = strings.plenary_popup_cursor_minus .. expected_col_no,
                 minwidth = 15,
                 maxwidth = 45,
                 minheight = 1,

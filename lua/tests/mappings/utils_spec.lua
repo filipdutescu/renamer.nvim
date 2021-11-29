@@ -1,3 +1,4 @@
+local strings = require('renamer.constants').strings
 local utils = require 'renamer.mappings.utils'
 
 local stub = require 'luassert.stub'
@@ -16,7 +17,7 @@ describe('mappings', function()
                 end)
 
                 eq(true, was_called)
-                assert.spy(nvim_command).was_called_with [[stopinsert]]
+                assert.spy(nvim_command).was_called_with(strings.stopinsert_command)
                 assert.spy(nvim_command).called_at_most(1)
             end)
 

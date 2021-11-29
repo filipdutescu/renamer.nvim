@@ -1,3 +1,4 @@
+local strings = require('renamer.constants').strings
 local utils = require 'renamer.mappings.utils'
 
 --- @class Mappings
@@ -13,6 +14,7 @@ local mappings = {
         ['<c-u>'] = utils.undo,
         ['<c-r>'] = utils.redo,
     },
+    bindings = {},
     keymap_opts = {
         noremap = true,
         silent = true,
@@ -22,11 +24,8 @@ local mappings = {
 mappings.register_bindings = function(buf_id)
     if buf_id and mappings.bindings then
         for binding, _ in pairs(mappings.bindings) do
-            local action = string.format(
-                '<cmd>lua require("renamer.mappings").exec_keymap_action("%s")<cr>',
-                binding:gsub('<', '<lt>')
-            )
-            vim.api.nvim_buf_set_keymap(buf_id, 'i', binding, action, mappings.keymap_opts)
+            local action = string.format(strings.exec_keymap_action_command_template, binding:gsub('<', '<lt>'))
+            vim.api.nvim_buf_set_keymap(buf_id, strings.insert_mode_short_string, binding, action, mappings.keymap_opts)
         end
     end
 end

@@ -1,3 +1,4 @@
+local strings = require('renamer.constants').strings
 local mappings = require 'renamer.mappings'
 
 local stub = require 'luassert.stub'
@@ -41,11 +42,14 @@ describe('mappings', function()
             mappings.register_bindings(buf_id)
 
             for key, _ in pairs(bindings) do
-                local action = string.format(
-                    '<cmd>lua require("renamer.mappings").exec_keymap_action("%s")<cr>',
-                    key:gsub('<', '<lt>')
+                local action = string.format(strings.exec_keymap_action_command_template, key:gsub('<', '<lt>'))
+                assert.spy(set_keymap).was_called_with(
+                    buf_id,
+                    strings.insert_mode_short_string,
+                    key,
+                    action,
+                    mappings.keymap_opts
                 )
-                assert.spy(set_keymap).was_called_with(buf_id, 'i', key, action, mappings.keymap_opts)
             end
         end)
     end)

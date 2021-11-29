@@ -1,3 +1,5 @@
+local strings = require('renamer.constants').strings
+
 local utils = {}
 
 function utils.get_value_or_default(table, name, default)
@@ -5,7 +7,7 @@ function utils.get_value_or_default(table, name, default)
         local actual_type, expected_type = type(table[name]), type(default)
         assert(
             type(table[name]) == type(default),
-            string.format('Invalid type for "%s". Expected "%s", but found "%s".', name, actual_type, expected_type)
+            string.format(strings.invalid_type_err_template, name, actual_type, expected_type)
         )
         return table[name]
     else
@@ -51,11 +53,11 @@ function utils.set_qf_list(changes)
             if vim.uri and vim.uri.uri_to_bufnr then
                 buf_id = vim.uri.uri_to_bufnr(file)
             else
-                local file_path = string.gsub(file, 'file://', '')
+                local file_path = string.gsub(file, strings.file_uri_schema, '')
                 buf_id = vim.fn.bufadd(file_path)
             end
             vim.fn.bufload(buf_id)
-            file = string.gsub(file, 'file://', '')
+            file = string.gsub(file, strings.file_uri_schema, '')
 
             for _, change in ipairs(data) do
                 local row, col = change.range.start.line, change.range.start.character
