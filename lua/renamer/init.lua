@@ -378,17 +378,26 @@ function renamer._lsp_rename(word, pos)
                 log.warn(strings.nil_lsp_response_err)
                 return
             end
-            local changes = resp.changes
-            if resp.documentChanges then
-                changes = {}
-                for _, change in ipairs(resp.documentChanges) do
-                    changes[change.textDocument.uri] = change.edits
-                end
-            end
 
             renamer._apply_workspace_edit(resp)
 
             if renamer.with_qf_list then
+                local changes = resp.changes
+                if resp.documentChanges then
+                    for _, change in ipairs(resp.documentChanges) do
+                        if change.textDocument and change.textDocument.uri then
+                            changes[change.textDocument.uri] = change.edits
+                        end
+                    end
+                    for _, change in ipairs(resp.documentChanges) do
+                        if change.newUri and change.oldUri and changes[change.oldUri] then
+                            local edits = changes[change.oldUri]
+                            changes[change.newUri] = edits
+                            changes[change.oldUri] = nil
+                        end
+                    end
+                end
+
                 utils.set_qf_list(changes)
             end
             if pos then
