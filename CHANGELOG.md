@@ -1,3 +1,30 @@
+# [4.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.3...v4.0.0) (2022-01-03)
+
+
+### Bug Fixes
+
+* **layout:** popup position when low number of lines ([0bb3b67](https://github.com/filipdutescu/renamer.nvim/commit/0bb3b67c24fa928c4e93c14b94878599e3a29518)), closes [#105](https://github.com/filipdutescu/renamer.nvim/issues/105)
+* names of min and max width parameters ([d6b6aef](https://github.com/filipdutescu/renamer.nvim/commit/d6b6aefb3a3f57750671ac077f546e0d230e4974))
+* **readme:** width parameter names were incorrect ([3af5113](https://github.com/filipdutescu/renamer.nvim/commit/3af51139e954b948e345974dba4f5c5360970b46))
+* **rename:** responses without `changes` break `qflist` ([842b499](https://github.com/filipdutescu/renamer.nvim/commit/842b4992ecc0a566d9fcc561832d580b1d364d8c)), closes [#106](https://github.com/filipdutescu/renamer.nvim/issues/106)
+* renaming leading to file rename ([814ddbb](https://github.com/filipdutescu/renamer.nvim/commit/814ddbb11602e3c8b2af166b4d1e029272ab796f)), closes [#100](https://github.com/filipdutescu/renamer.nvim/issues/100)
+
+
+### Features
+
+* add customizable min and max width ([e9d8653](https://github.com/filipdutescu/renamer.nvim/commit/e9d86536da51559974d1876ebb3b46fd096a70b3)), closes [#101](https://github.com/filipdutescu/renamer.nvim/issues/101)
+
+
+### BREAKING CHANGES
+
+* Rename `minwidth` and `maxwidth` to the naming
+convention used throughout the rest of the code (snake case). The two
+will now be used as `min_width` and `max_width`.
+
+Signed-off-by: Filip Dutescu <filip.dutescu@gmail.com>
+
+
+
 ## [3.0.3](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.2...v3.0.3) (2021-11-29)
 
 
