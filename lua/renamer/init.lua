@@ -146,7 +146,8 @@ function renamer.rename(opts)
         return
     end
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
-    local lines_from_win_end = vim.api.nvim_buf_line_count(0) - line
+    local line_count = vim.api.nvim_buf_line_count(0)
+    local lines_from_win_end = line_count - line
     local width = 0
 
     if renamer.title then
@@ -158,7 +159,7 @@ function renamer.rename(opts)
     if not (renamer.border == true) then
         prompt_line_no = 1
     end
-    if lines_from_win_end < prompt_line_no + 1 then
+    if lines_from_win_end < prompt_line_no + 1 and line_count >= win_height - 1 then
         prompt_line_no = -prompt_line_no
     end
     if word_start + width >= win_width then

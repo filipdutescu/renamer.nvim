@@ -137,9 +137,35 @@ describe('renamer', function()
                 local lsp_mock = mock(vim.lsp, true)
                 lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns { 1, 2 }
+                api_mock.nvim_win_get_cursor.returns { 9, 2 }
                 api_mock.nvim_command.returns()
-                api_mock.nvim_buf_line_count.returns(1)
+                api_mock.nvim_buf_line_count.returns(10)
+                api_mock.nvim_get_mode.returns {}
+                api_mock.nvim_win_get_width.returns(100)
+                api_mock.nvim_win_get_height.returns(10)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
+                local document_highlight = stub(renamer, '_document_highlight').returns()
+                local set_cursor = stub(renamer, '_set_cursor_to_popup_end')
+                stub(popup, 'create').returns(1, {})
+
+                local _, opts = renamer.rename()
+
+                eq(expected_line, opts.opts.line)
+                mock.revert(api_mock)
+                mock.revert(lsp_mock)
+                document_highlight.revert(document_highlight)
+                set_cursor.revert(set_cursor)
+            end)
+
+            it('should not flip line pos if there is enough space after the last line', function()
+                local expected_line_no = 2
+                local expected_line = strings.plenary_popup_cursor_plus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_get_cursor.returns { 5, 2 }
+                api_mock.nvim_command.returns()
+                api_mock.nvim_buf_line_count.returns(5)
                 api_mock.nvim_get_mode.returns {}
                 api_mock.nvim_win_get_width.returns(100)
                 api_mock.nvim_win_get_height.returns(10)
@@ -307,9 +333,35 @@ describe('renamer', function()
                 local lsp_mock = mock(vim.lsp, true)
                 lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
-                api_mock.nvim_win_get_cursor.returns { 1, 2 }
+                api_mock.nvim_win_get_cursor.returns { 10, 2 }
                 api_mock.nvim_command.returns()
-                api_mock.nvim_buf_line_count.returns(1)
+                api_mock.nvim_buf_line_count.returns(10)
+                api_mock.nvim_get_mode.returns {}
+                api_mock.nvim_win_get_width.returns(100)
+                api_mock.nvim_win_get_height.returns(10)
+                stub(utils, 'get_word_boundaries_in_line').returns(1, 2)
+                local set_cursor = stub(renamer, '_set_cursor_to_popup_end')
+                local document_highlight = stub(renamer, '_document_highlight').returns()
+                stub(popup, 'create').returns(1, {})
+
+                local _, opts = renamer.rename()
+
+                eq(expected_line, opts.opts.line)
+                mock.revert(api_mock)
+                mock.revert(lsp_mock)
+                document_highlight.revert(document_highlight)
+                set_cursor.revert(set_cursor)
+            end)
+
+            it('should not flip line pos if there is enough space after the last line', function()
+                local expected_line_no = 1
+                local expected_line = strings.plenary_popup_cursor_plus .. expected_line_no
+                local lsp_mock = mock(vim.lsp, true)
+                lsp_mock.buf_get_clients.returns { {} }
+                local api_mock = mock(vim.api, true)
+                api_mock.nvim_win_get_cursor.returns { 5, 2 }
+                api_mock.nvim_command.returns()
+                api_mock.nvim_buf_line_count.returns(5)
                 api_mock.nvim_get_mode.returns {}
                 api_mock.nvim_win_get_width.returns(100)
                 api_mock.nvim_win_get_height.returns(10)
