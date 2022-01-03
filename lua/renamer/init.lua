@@ -391,7 +391,7 @@ function renamer._lsp_rename(word, pos)
             renamer._apply_workspace_edit(resp)
 
             if renamer.with_qf_list then
-                local changes = resp.changes
+                local changes = resp.changes or {}
                 if resp.documentChanges then
                     for _, change in ipairs(resp.documentChanges) do
                         if change.textDocument and change.textDocument.uri then
