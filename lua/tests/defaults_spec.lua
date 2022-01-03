@@ -11,6 +11,8 @@ describe('defaults', function()
                 bottom = 0,
                 right = 0,
             },
+            minwidth = 15,
+            maxwidth = 45,
             border = true,
             border_chars = { '─', '│', '─', '│', '╭', '╮', '╯', '╰' },
             show_refs = true,

@@ -127,6 +127,10 @@ require('renamer').setup {
         bottom = 0,
         right = 0,
     },
+    -- The minimum width of the popup
+    minwidth = 15,
+    -- The maximum width of the popup
+    maxwidth = 45,
     -- Whether or not to shown a border around the popup
     border = true,
     -- The characters which make up the border

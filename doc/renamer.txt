@@ -43,6 +43,10 @@ renamer.setup({opts})
             bottom = 0,
             right = 0,
         },
+        -- The minimum width of the popup
+        minwidth = 15,
+        -- The maximum width of the popup
+        maxwidth = 45,
         -- Whether or not to shown a border around the popup
         border = true,
         -- The characters which make up the border
@@ -83,6 +87,10 @@ renamer.setup({opts})
                                     above/right/below/left
                                     (default: { top = 0, left = 0, bottom = 0,
                                     right = 0 })
+        {minwidth}      (integer)   minimum width that the popup should have
+                                    (default: 15)
+        {maxwidth}      (integer)   maximum width that the popup should have
+                                    (default: 45)
         {border}        (boolean)   defines whether or not to draw the border
                                     (default: true)
         {border_chars}  (list)      list of characters to use for the border,

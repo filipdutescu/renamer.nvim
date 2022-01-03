@@ -11,6 +11,8 @@ local mappings = require 'renamer.mappings'
 --- @class Renamer
 --- @field public title string
 --- @field public padding integer[]
+--- @field public minwidth integer
+--- @field public maxwidth integer
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
@@ -37,6 +39,10 @@ local renamer = {}
 ---         bottom = 0,
 ---         right = 0,
 ---     },
+---     -- The minimum width of the popup
+---     minwidth = 15,
+---     -- The maximum width of the popup
+---     maxwidth = 45,
 ---     -- Whether or not to shown a border around the popup
 ---     border = true,
 ---     -- The characters which make up the border
@@ -77,6 +83,8 @@ function renamer.setup(opts)
         bottom = utils.get_value_or_default(opts.padding, 'bottom', defaults.padding.bottom),
         right = utils.get_value_or_default(opts.padding, 'right', defaults.padding.right),
     }
+    renamer.minwidth = utils.get_value_or_default(opts, 'minwidth', defaults.minwidth)
+    renamer.maxwidth = utils.get_value_or_default(opts, 'maxwidth', defaults.maxwidth)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
@@ -260,8 +268,8 @@ function renamer._create_default_popup_opts(cword)
         borderchars = renamer.border_chars,
         highlight = strings.highlight_normal,
         borderhighlight = strings.highlight_border,
-        minwidth = 15,
-        maxwidth = 45,
+        minwidth = renamer.minwidth,
+        maxwidth = renamer.maxwidth,
         minheight = 1,
         posinvert = false,
         cursor_line = true,

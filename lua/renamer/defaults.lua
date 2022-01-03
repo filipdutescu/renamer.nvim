@@ -3,6 +3,8 @@ local mappings = require 'renamer.mappings'
 --- @class Defaults
 --- @field public title string
 --- @field public padding table
+--- @field public minwidth integer
+--- @field public maxwidth integer
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
@@ -20,6 +22,10 @@ local defaults = {
         bottom = 0,
         right = 0,
     },
+    -- The minimum width of the popup
+    minwidth = 15,
+    -- The maximum width of the popup
+    maxwidth = 45,
     -- Whether or not to shown a border around the popup
     border = true,
     -- The characters which make up the border
