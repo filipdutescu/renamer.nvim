@@ -11,8 +11,8 @@ local mappings = require 'renamer.mappings'
 --- @class Renamer
 --- @field public title string
 --- @field public padding integer[]
---- @field public minwidth integer
---- @field public maxwidth integer
+--- @field public min_width integer
+--- @field public max_width integer
 --- @field public border boolean
 --- @field public border_chars string[]
 --- @field public show_refs boolean
@@ -40,9 +40,9 @@ local renamer = {}
 ---         right = 0,
 ---     },
 ---     -- The minimum width of the popup
----     minwidth = 15,
+---     min_width = 15,
 ---     -- The maximum width of the popup
----     maxwidth = 45,
+---     max_width = 45,
 ---     -- Whether or not to shown a border around the popup
 ---     border = true,
 ---     -- The characters which make up the border
@@ -83,8 +83,8 @@ function renamer.setup(opts)
         bottom = utils.get_value_or_default(opts.padding, 'bottom', defaults.padding.bottom),
         right = utils.get_value_or_default(opts.padding, 'right', defaults.padding.right),
     }
-    renamer.minwidth = utils.get_value_or_default(opts, 'minwidth', defaults.minwidth)
-    renamer.maxwidth = utils.get_value_or_default(opts, 'maxwidth', defaults.maxwidth)
+    renamer.min_width = utils.get_value_or_default(opts, 'min_width', defaults.min_width)
+    renamer.max_width = utils.get_value_or_default(opts, 'max_width', defaults.max_width)
     renamer.border = utils.get_value_or_default(opts, 'border', defaults.border)
     renamer.border_chars = utils.get_value_or_default(opts, 'border_chars', defaults.border_chars)
     renamer.show_refs = utils.get_value_or_default(opts, 'show_refs', defaults.show_refs)
@@ -268,8 +268,8 @@ function renamer._create_default_popup_opts(cword)
         borderchars = renamer.border_chars,
         highlight = strings.highlight_normal,
         borderhighlight = strings.highlight_border,
-        minwidth = renamer.minwidth,
-        maxwidth = renamer.maxwidth,
+        minwidth = renamer.min_width,
+        maxwidth = renamer.max_width,
         minheight = 1,
         posinvert = false,
         cursor_line = true,
