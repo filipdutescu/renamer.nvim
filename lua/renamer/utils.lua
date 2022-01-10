@@ -31,8 +31,10 @@ function utils.get_word_boundaries_in_line(line, word, line_pos)
         if
             word_start
             and word_end
-            and math.abs(line_pos - word_start) < math.abs(line_pos - closest_word_start)
-            and math.abs(word_end - line_pos) < math.abs(closest_word_end - line_pos)
+            and (
+                math.abs(line_pos - word_start) < math.abs(line_pos - closest_word_start)
+                or math.abs(word_end - line_pos) < math.abs(closest_word_end - line_pos)
+            )
         then
             closest_word_start, closest_word_end = word_start, word_end
         end
