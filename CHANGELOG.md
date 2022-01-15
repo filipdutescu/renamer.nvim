@@ -1,3 +1,13 @@
+## [4.0.1](https://github.com/filipdutescu/renamer.nvim/compare/v4.0.0...v4.0.1) (2022-01-15)
+
+
+### Bug Fixes
+
+* popup having `sidescrolloff` if set ([917e17d](https://github.com/filipdutescu/renamer.nvim/commit/917e17d036a68b6595e3afd209945f94607d3f9f)), closes [#101](https://github.com/filipdutescu/renamer.nvim/issues/101)
+* popup not showing if renamed word appears twice ([d02d6e9](https://github.com/filipdutescu/renamer.nvim/commit/d02d6e94e968c3b0860f6b26d903147e6dd54c40)), closes [#113](https://github.com/filipdutescu/renamer.nvim/issues/113)
+
+
+
 # [4.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v3.0.3...v4.0.0) (2022-01-03)
 
 
