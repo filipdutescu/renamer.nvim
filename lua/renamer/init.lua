@@ -154,7 +154,7 @@ function renamer.rename(opts)
         width = #renamer.title + 4
     end
     if width >= win_width or #cword > width then
-        width = #cword
+        width = #cword + 1
     end
     if not (renamer.border == true) then
         prompt_line_no = 1
@@ -306,6 +306,7 @@ function renamer._setup_window(prompt_win_id)
 
     vim.api.nvim_win_set_option(prompt_win_id, strings.win_opt_wrap, false)
     vim.api.nvim_win_set_option(prompt_win_id, strings.win_opt_winblend, 0)
+    vim.api.nvim_win_set_option(prompt_win_id, strings.win_opt_sidescrolloff, 0)
 
     vim.api.nvim_command(strings.startinsert_command)
     renamer._create_autocmds(prompt_win_id)

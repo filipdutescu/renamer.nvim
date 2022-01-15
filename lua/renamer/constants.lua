@@ -15,6 +15,7 @@ local strings = {
     buf_delete_command_template = 'silent! bdelete! %s',
     win_opt_wrap = 'wrap',
     win_opt_winblend = 'winblend',
+    win_opt_sidescrolloff = 'sidescrolloff',
     buf_opt_buflisted = 'buflisted',
     autocmd_buf_leave_template = 'autocmd BufLeave,WinLeave <buffer> ++nested ++once :silent lua require("renamer").on_close(%s)',
     augroup_start = 'augroup RenamerInsert',

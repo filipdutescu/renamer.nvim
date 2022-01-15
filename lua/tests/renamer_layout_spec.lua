@@ -17,7 +17,7 @@ describe('renamer', function()
                 renamer.setup { title = string.rep('a', 16) }
                 local cursor_col, word_start, win_width = 15, 13, 20
                 local cword = 'test'
-                local expected_width = #cword
+                local expected_width = #cword + 1
                 local lsp_mock = mock(vim.lsp, true)
                 lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
@@ -47,7 +47,7 @@ describe('renamer', function()
                 renamer.setup { title = 'a' }
                 local cursor_col, word_start, win_width = 15, 13, 20
                 local cword = 'testing'
-                local expected_width = #cword
+                local expected_width = #cword + 1
                 local lsp_mock = mock(vim.lsp, true)
                 lsp_mock.buf_get_clients.returns { {} }
                 local api_mock = mock(vim.api, true)
