@@ -483,7 +483,12 @@ function renamer._buf_request(buf_id, method, params, handler)
 end
 
 function renamer._apply_workspace_edit(resp)
-    lsp_utils.apply_workspace_edit(resp)
+    local params = vim.lsp.util.make_position_params()
+    local results_lsp, _ = vim.lsp.buf_request_sync(0, strings.lsp_req_rename, params)
+    local client_id = results_lsp and next(results_lsp) or nil
+    local client = vim.lsp.get_client_by_id(client_id)
+
+    lsp_utils.apply_workspace_edit(resp, client.offset_encoding)
 end
 
 return renamer
