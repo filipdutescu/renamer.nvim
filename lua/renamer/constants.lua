@@ -33,7 +33,6 @@ local strings = {
     highlight_title = 'RenamerTitle',
     highlight_normal = 'RenamerNormal',
     highlight_border = 'RenamerBorder',
-    lsp_req_prepare_rename = 'textDocument/prepareRename',
     lsp_req_rename = 'textDocument/rename',
     file_uri_schema = 'file://',
     invalid_cursor_position_err = 'Cannot find word start using cursor position. Please ensure cursor is placed on a word.',

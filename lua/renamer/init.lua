@@ -96,6 +96,8 @@ function renamer.setup(opts)
     end
 
     renamer._buffers = {}
+    renamer._nvim_rename_handler = vim.lsp.handlers[strings.lsp_req_rename]
+    vim.lsp.handlers[strings.lsp_req_rename] = renamer._rename_handler
     log.info(strings.finished_setup)
 end
 
@@ -222,19 +224,16 @@ function renamer.on_submit(window_id)
         renamer._delete_autocmds()
         if not (new_word == '') then
             log.fmt_info(strings.submitted_word_template, new_word)
-            renamer.on_close(window_id, false)
+            renamer.on_close(window_id)
             renamer._lsp_rename(new_word, pos)
         else
-            renamer.on_close(window_id, true)
+            renamer.on_close(window_id)
             log.fmt_error(strings.rename_to_empty_string_err_template, opts.initial_word)
         end
     end
 end
 
-function renamer.on_close(window_id, should_set_cursor_pos)
-    if should_set_cursor_pos == nil then
-        should_set_cursor_pos = true
-    end
+function renamer.on_close(window_id)
     local settings = renamer._buffers and renamer._buffers[window_id]
     local border_win_id = settings and settings.border_opts and settings.border_opts.win_id
     local initial_mode = settings and settings.opts and settings.opts.initial_mode
@@ -250,7 +249,7 @@ function renamer.on_close(window_id, should_set_cursor_pos)
         vim.api.nvim_command(strings.stopinsert_command)
     end
 
-    if should_set_cursor_pos and pos then
+    if pos then
         local col = pos.col
         if initial_mode and not string.match(initial_mode, strings.insert_mode_short_string) then
             col = col + 1
@@ -370,59 +369,78 @@ function renamer._input_lsp_rename(cword, position)
 end
 
 function renamer._lsp_rename(word, pos)
-    local params = renamer._make_position_params()
+    renamer._current_op = {
+        pos = pos,
+        word = word,
+    }
+    renamer._lsp_rename_internal(word)
+end
 
-    renamer._buf_request(0, strings.lsp_req_prepare_rename, params, function(prep_err, prep_resp)
-        if prep_err == nil and prep_resp == nil then
-            log.warn(strings.nothing_to_rename_err)
-            return
+-- Since there is no way to mock `vim.lsp.buf.rename`, this function is used as a replacement.
+function renamer._lsp_rename_internal(word)
+    vim.lsp.buf.rename(word)
+end
+
+function renamer._rename_handler(...)
+    local resp
+    local method
+    local err = select(1, ...)
+    local is_new = not select(4, ...) or type(select(4, ...)) ~= 'number'
+
+    if is_new then
+        method = select(3, ...).method
+        resp = select(2, ...)
+    else
+        method = select(2, ...)
+        resp = select(3, ...)
+    end
+
+    if err then
+        log.error(err)
+        return
+    end
+    if resp == nil then
+        log.warn(strings.nil_lsp_response_err)
+        return
+    end
+
+    if method == strings.lsp_req_rename then
+        renamer._nvim_rename_handler(...)
+    else
+        vim.lsp.handlers[method](...)
+    end
+
+    if renamer.with_qf_list then
+        local changes = resp.changes or {}
+        if resp.documentChanges then
+            for _, change in ipairs(resp.documentChanges) do
+                if change.textDocument and change.textDocument.uri then
+                    changes[change.textDocument.uri] = change.edits
+                end
+            end
+            for _, change in ipairs(resp.documentChanges) do
+                if change.newUri and change.oldUri and changes[change.oldUri] then
+                    local edits = changes[change.oldUri]
+                    changes[change.newUri] = edits
+                    changes[change.oldUri] = nil
+                end
+            end
         end
-        params.newName = word
 
-        renamer._buf_request(0, strings.lsp_req_rename, params, function(err, resp)
-            if err then
-                log.error(err)
-                return
-            end
-            if resp == nil then
-                log.warn(strings.nil_lsp_response_err)
-                return
-            end
-
-            renamer._apply_workspace_edit(resp)
-
-            if renamer.with_qf_list then
-                local changes = resp.changes or {}
-                if resp.documentChanges then
-                    for _, change in ipairs(resp.documentChanges) do
-                        if change.textDocument and change.textDocument.uri then
-                            changes[change.textDocument.uri] = change.edits
-                        end
-                    end
-                    for _, change in ipairs(resp.documentChanges) do
-                        if change.newUri and change.oldUri and changes[change.oldUri] then
-                            local edits = changes[change.oldUri]
-                            changes[change.newUri] = edits
-                            changes[change.oldUri] = nil
-                        end
-                    end
-                end
-
-                utils.set_qf_list(changes)
-            end
-            if pos then
-                local col = pos.word_start + #word - 1
-                local mode = vim.api.nvim_get_mode().mode
-                if mode and not string.match(mode, strings.insert_mode_short_string) then
-                    col = col - 1
-                end
-                vim.api.nvim_win_set_cursor(0, { pos.line, col })
-            end
-            if renamer.handler then
-                renamer.handler(resp)
-            end
-        end)
-    end)
+        utils.set_qf_list(changes)
+    end
+    if renamer._current_op and renamer._current_op.pos then
+        local col = renamer._current_op.pos.word_start + #renamer._current_op.word - 1
+        local mode = vim.api.nvim_get_mode().mode
+        if mode and not string.match(mode, strings.insert_mode_short_string) then
+            col = col - 1
+        end
+        vim.api.nvim_win_set_cursor(0, { renamer._current_op.pos.line, col })
+        renamer._current_op = {}
+    end
+    if renamer.handler then
+        renamer.handler(resp)
+    end
 end
 
 function renamer._document_highlight()
@@ -470,16 +488,6 @@ end
 -- Since there is no way to mock `vim.lsp.buf.clear_references`, this function is used as a replacement.
 function renamer._clear_references_internal()
     vim.lsp.buf.clear_references()
-end
-
--- Since there is no way to mock `vim.lsp.buf_request`, this function is used as a replacement
-function renamer._make_position_params()
-    return lsp_utils.make_position_params()
-end
-
--- Since there is no way to mock `vim.lsp.buf_request`, this function is used as a replacement
-function renamer._buf_request(buf_id, method, params, handler)
-    vim.lsp.buf_request(buf_id, method, params, handler)
 end
 
 function renamer._apply_workspace_edit(resp)
