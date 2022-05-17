@@ -1,6 +1,5 @@
 local strings = require('renamer.constants').strings
 local renamer = require 'renamer'
-local utils = require 'renamer.utils'
 
 local mock = require 'luassert.mock'
 local stub = require 'luassert.stub'
@@ -89,7 +88,7 @@ describe('renamer', function()
 
             renamer.on_submit(expected_win_id)
 
-            assert.spy(renamer.on_close).was_called_with(expected_win_id, false)
+            assert.spy(renamer.on_close).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
             mock.revert(api_mock)
@@ -112,7 +111,7 @@ describe('renamer', function()
             renamer.on_submit(expected_win_id)
 
             assert.spy(lsp_rename).was_called_with(expected_content, expected_pos)
-            assert.spy(on_close).was_called_with(expected_win_id, false)
+            assert.spy(on_close).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
             mock.revert(api_mock)
@@ -135,201 +134,12 @@ describe('renamer', function()
             renamer.on_submit(expected_win_id)
 
             assert.spy(lsp_rename).called_less_than(1)
-            assert.spy(on_close).was_called_with(expected_win_id, true)
+            assert.spy(on_close).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
             mock.revert(api_mock)
             on_close.revert(on_close)
             lsp_rename.revert(lsp_rename)
-        end)
-
-        it('should not apply changes if error is received', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler({}, nil)
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(apply_changes).called_less_than(1)
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
-        end)
-
-        it('should not apply changes if no response is received', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler(nil, nil)
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(apply_changes).called_less_than(1)
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
-        end)
-
-        it('should apply changes if no error is received', function()
-            renamer.setup { with_qf_list = false }
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            api_mock.nvim_get_mode.returns(strings.insert_mode_short_string)
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler(nil, {})
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(apply_changes).was_called()
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
-        end)
-
-        it('should call the custom handler if it is set', function()
-            local custom_handler_called = false
-            renamer.setup {
-                with_qf_list = false,
-                handler = function()
-                    custom_handler_called = true
-                end,
-            }
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            api_mock.nvim_get_mode.returns(strings.insert_mode_short_string)
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler(nil, {})
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            eq(true, custom_handler_called)
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
-        end)
-
-        it('should set qf list if the option is turned on', function()
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler({}, nil)
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local set_qf_list = stub(utils, 'set_qf_list')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(apply_changes).called_less_than(1)
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
-            set_qf_list.revert(set_qf_list)
-        end)
-
-        it('should set cursor after the end of the new word', function()
-            renamer.setup { with_qf_list = false }
-            local expected_win_id, expected_buf_id = 123, 321
-            local expected_content = 'test'
-            local api_mock = mock(vim.api, true)
-            api_mock.nvim_win_get_buf.returns(expected_buf_id)
-            api_mock.nvim_buf_get_lines.returns { expected_content }
-            api_mock.nvim_command.returns()
-            api_mock.nvim_get_mode.returns(strings.insert_mode_short_string)
-            local on_close = stub(renamer, 'on_close').returns()
-            local buf_request = stub(renamer, '_buf_request').invokes(function(_, _, _, handler)
-                handler(nil, {})
-            end)
-            local expected_pos = { word_start = 1, line = 1, col = 1 }
-            local expected_col = expected_pos.word_start + #expected_content - 1
-            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
-            local apply_changes = stub(renamer, '_apply_workspace_edit')
-            local make_params = stub(renamer, '_make_position_params').returns {}
-
-            renamer.on_submit(expected_win_id)
-
-            assert.spy(api_mock.nvim_win_set_cursor).was_called_with(0, { expected_pos.line, expected_col })
-            assert.spy(on_close).was_called_with(expected_win_id, false)
-            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
-            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
-            mock.revert(api_mock)
-            on_close.revert(on_close)
-            buf_request.revert(buf_request)
-            apply_changes.revert(apply_changes)
-            make_params.revert(make_params)
         end)
     end)
 
