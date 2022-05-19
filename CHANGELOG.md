@@ -1,3 +1,29 @@
+# [5.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v4.0.1...v5.0.0) (2022-05-19)
+
+
+### Bug Fixes
+
+* **submit:** trim new word before using (GH-123) ([7a2c0a1](https://github.com/filipdutescu/renamer.nvim/commit/7a2c0a1fd47d3dc94cc77db27b94a586ccc007a1)), closes [#123](https://github.com/filipdutescu/renamer.nvim/issues/123) [#119](https://github.com/filipdutescu/renamer.nvim/issues/119)
+
+
+### Features
+
+* **handler:** migrate to handler (GH-122) ([6c99bd9](https://github.com/filipdutescu/renamer.nvim/commit/6c99bd95dc7bf964f755f28ab4df83fd71fcdcbd)), closes [#122](https://github.com/filipdutescu/renamer.nvim/issues/122) [#117](https://github.com/filipdutescu/renamer.nvim/issues/117) [#121](https://github.com/filipdutescu/renamer.nvim/issues/121)
+
+
+### BREAKING CHANGES
+
+* **handler:** Migrate the LSP buffer request from manual to using
+`vim.lsp.buf.rename(...)` to make the request and a custom LSP response
+handler to manage the custom response processing (eg setting the qf
+list) and the original Neovim rename handler to apply the requested
+changes.
+
+This implies removing several existing function, doing some cleanup of
+tests and updating the documentation.
+
+
+
 ## [4.0.1](https://github.com/filipdutescu/renamer.nvim/compare/v4.0.0...v4.0.1) (2022-01-15)
 
 
