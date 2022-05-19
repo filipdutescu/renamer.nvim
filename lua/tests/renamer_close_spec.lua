@@ -8,8 +8,15 @@ local spy = require 'luassert.spy'
 local eq = assert.are.same
 
 describe('renamer', function()
+    local log = nil
+
     before_each(function()
         renamer.setup()
+        log = mock(renamer._log)
+    end)
+
+    after_each(function()
+        mock.revert(log)
     end)
 
     describe('on_submit', function()
@@ -64,7 +71,7 @@ describe('renamer', function()
             local delete_autocmds = spy.on(renamer, '_delete_autocmds')
             local on_close = stub(renamer, 'on_close').returns()
             local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = {}
+            renamer._buffers[expected_win_id] = { opts = { initial_word = '' } }
 
             renamer.on_submit(expected_win_id)
 
@@ -84,7 +91,7 @@ describe('renamer', function()
             api_mock.nvim_command.returns()
             local on_close = stub(renamer, 'on_close').returns()
             local lsp_rename = stub(renamer, '_lsp_rename').returns()
-            renamer._buffers[expected_win_id] = {}
+            renamer._buffers[expected_win_id] = { opts = { initial_word = '' } }
 
             renamer.on_submit(expected_win_id)
 
@@ -134,6 +141,29 @@ describe('renamer', function()
             renamer.on_submit(expected_win_id)
 
             assert.spy(lsp_rename).called_less_than(1)
+            assert.spy(on_close).was_called_with(expected_win_id)
+            assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
+            assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)
+            mock.revert(api_mock)
+            on_close.revert(on_close)
+            lsp_rename.revert(lsp_rename)
+        end)
+
+        it('should call `_lsp_rename` with new word trimmed of spaces', function()
+            local expected_win_id, expected_buf_id = 123, 321
+            local expected_content = 'test'
+            local api_mock = mock(vim.api, true)
+            api_mock.nvim_win_get_buf.returns(expected_buf_id)
+            api_mock.nvim_buf_get_lines.returns { '   ' .. expected_content .. '   ' }
+            api_mock.nvim_command.returns()
+            local on_close = stub(renamer, 'on_close').returns()
+            local lsp_rename = stub(renamer, '_lsp_rename').returns()
+            local expected_pos = { word_start = 1, line = 1, col = 1 }
+            renamer._buffers[expected_win_id] = { opts = { initial_word = 'test', initial_pos = expected_pos } }
+
+            renamer.on_submit(expected_win_id)
+
+            assert.spy(lsp_rename).was_called_with(expected_content, expected_pos)
             assert.spy(on_close).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_win_get_buf).was_called_with(expected_win_id)
             assert.spy(api_mock.nvim_buf_get_lines).was_called_with(expected_buf_id, -2, -1, false)

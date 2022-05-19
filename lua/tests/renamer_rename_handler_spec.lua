@@ -9,8 +9,15 @@ local spy = require 'luassert.spy'
 local eq = assert.are.same
 
 describe('_rename_handler', function()
+    local log = nil
+
     before_each(function()
         renamer.setup { with_qf_list = false }
+        log = mock(renamer._log)
+    end)
+
+    after_each(function()
+        mock.revert(log)
     end)
 
     it('should not apply changes if error is received', function()

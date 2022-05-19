@@ -20,8 +20,11 @@ local mappings = require 'renamer.mappings'
 --- @field public with_popup boolean
 --- @field public bindings table
 --- @field public handler function
+--- @field private _log table
 --- @field private _buffers table
+--- @field private _nvim_rename_handler table
 local renamer = {}
+renamer._log = log
 
 --- Setup function to be run by the user. Configures the aspect of the renamer
 --- user interface. Used to change things such as the title or border of the
@@ -98,7 +101,7 @@ function renamer.setup(opts)
     renamer._buffers = {}
     renamer._nvim_rename_handler = vim.lsp.handlers[strings.lsp_req_rename]
     vim.lsp.handlers[strings.lsp_req_rename] = renamer._rename_handler
-    log.info(strings.finished_setup)
+    renamer._log.info(strings.finished_setup)
 end
 
 --- Function that renames the word under the cursor, using Neovim's built in
@@ -128,7 +131,7 @@ function renamer.rename(opts)
 
     local lsp_clients = vim.lsp.buf_get_clients(0)
     if lsp_clients == nil or #lsp_clients < 1 then
-        log.error(strings.no_lsp_client_found_err)
+        renamer._log.error(strings.no_lsp_client_found_err)
     end
 
     local cword = vim.fn.expand(strings.cword_keyword)
@@ -144,7 +147,7 @@ function renamer.rename(opts)
     local line, col = renamer._get_cursor()
     local word_start, _ = utils.get_word_boundaries_in_line(vim.api.nvim_get_current_line(), cword, col + 1)
     if word_start == nil then
-        log.info(strings.invalid_cursor_position_err)
+        renamer._log.info(strings.invalid_cursor_position_err)
         return
     end
     local prompt_col_no, prompt_line_no = col - word_start + 1, 2
@@ -185,7 +188,7 @@ function renamer.rename(opts)
 
     if is_height_too_short or is_width_too_short or renamer.with_popup == false then
         if is_height_too_short or is_width_too_short then
-            log.error(strings.not_enough_space_err)
+            renamer._log.error(strings.not_enough_space_err)
         end
 
         renamer._input_lsp_rename(cword, popup_opts.initial_pos)
@@ -203,13 +206,13 @@ function renamer.rename(opts)
         opts = popup_opts,
         border_opts = prompt_opts.border,
     }
-    log.fmt_info(strings.created_popup_template, vim.inspect(renamer._buffers[prompt_win_id]))
+    renamer._log.fmt_info(strings.created_popup_template, vim.inspect(renamer._buffers[prompt_win_id]))
 
     renamer._setup_window(prompt_win_id)
     renamer._set_cursor_to_popup_end()
-    log.trace(strings.finished_popup_setup)
+    renamer._log.trace(strings.finished_popup_setup)
     renamer._set_prompt_win_style(prompt_win_id)
-    log.trace(strings.finished_popup_styling)
+    renamer._log.trace(strings.finished_popup_styling)
 
     return prompt_win_id, renamer._buffers[prompt_win_id]
 end
@@ -221,14 +224,19 @@ function renamer.on_submit(window_id)
         local buf_id = vim.api.nvim_win_get_buf(window_id)
         local new_word = vim.api.nvim_buf_get_lines(buf_id, -2, -1, false)[1]
 
+        if new_word == nil then
+            new_word = ''
+        end
+
         renamer._delete_autocmds()
         if not (new_word == '') then
-            log.fmt_info(strings.submitted_word_template, new_word)
+            new_word = string.gsub(new_word, '^%s*(.-)%s*$', '%1')
+            renamer._log.fmt_info(strings.submitted_word_template, new_word)
             renamer.on_close(window_id)
             renamer._lsp_rename(new_word, pos)
         else
             renamer.on_close(window_id)
-            log.fmt_error(strings.rename_to_empty_string_err_template, opts.initial_word)
+            renamer._log.fmt_error(strings.rename_to_empty_string_err_template, opts.initial_word)
         end
     end
 end
@@ -240,9 +248,9 @@ function renamer.on_close(window_id)
     local pos = settings and settings.opts and settings.opts.initial_pos
 
     renamer._delete_window(window_id)
-    log.fmt_info(strings.deleted_window_template, window_id)
+    renamer._log.fmt_info(strings.deleted_window_template, window_id)
     renamer._delete_window(border_win_id)
-    log.fmt_info(strings.deleted_window_border_template, border_win_id)
+    renamer._log.fmt_info(strings.deleted_window_border_template, border_win_id)
 
     renamer._clear_references()
     if initial_mode and not string.match(initial_mode, strings.insert_mode_short_string) then
@@ -396,11 +404,11 @@ function renamer._rename_handler(...)
     end
 
     if err then
-        log.error(err)
+        renamer._log.error(err)
         return
     end
     if resp == nil then
-        log.warn(strings.nil_lsp_response_err)
+        renamer._log.warn(strings.nil_lsp_response_err)
         return
     end
 
@@ -468,7 +476,7 @@ function renamer._delete_window(win_id)
         if vim.api.nvim_win_is_valid(win_id) then
             vim.api.nvim_win_close(win_id, true)
             if not pcall(vim.api.nvim_win_close, win_id, true) then
-                log.trace(string.format(strings.failed_to_close_window_err_template, win_id))
+                renamer._log.trace(string.format(strings.failed_to_close_window_err_template, win_id))
             end
         end
     end
