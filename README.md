@@ -35,6 +35,10 @@ LSP feature as its backend.
 - **References highlighting:** of the word to be renamed, using Neovim's LSP (see
   [References highlighting](#references-highlighting))
 - **Keymaps:** predefined keymaps to help you navigate and manipulate the popup
+- **LSP handler:** if you do not wish to use the UI offered by the plugin, you can
+still use the custom handler it has underneath to benefit from quickfix list
+population and addition of your own custom response handler or cursor setting at
+the end of the new word.
 
 ## Getting started
 

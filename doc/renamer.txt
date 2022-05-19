@@ -5,6 +5,11 @@ Renamer.nvim is a plugin for a Visual-Studio-Code-like user interface for
 renaming in neovim. It provides several ways to configure its aspect and uses
 the LSP API to rename the current word under the cursor.
 
+Calling setup also overrides the existing Neovim LSP handler for the rename
+operation with the custom one of `renamer`. You can use this if you do not
+want to use the plugin interface, but still want to benefit from quickfix list
+popuplation, cursor setting at the end of the new word and more.
+
 Getting started with renamer:
   1. Run `:checkhealth renamer` to make sure everything is installed.
   2. Put a `require('renamer').setup()` call somewhere in your neovim config.
