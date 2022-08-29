@@ -1,3 +1,12 @@
+# [5.1.0](https://github.com/filipdutescu/renamer.nvim/compare/v5.0.0...v5.1.0) (2022-08-29)
+
+
+### Features
+
+* **health:** add more checks and logs ([2343e90](https://github.com/filipdutescu/renamer.nvim/commit/2343e901541d667380f69741833ffa00aff14564)), closes [#128](https://github.com/filipdutescu/renamer.nvim/issues/128) [#127](https://github.com/filipdutescu/renamer.nvim/issues/127)
+
+
+
 # [5.0.0](https://github.com/filipdutescu/renamer.nvim/compare/v4.0.1...v5.0.0) (2022-05-19)
 
 
