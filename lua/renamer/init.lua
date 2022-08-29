@@ -129,9 +129,9 @@ end
 function renamer.rename(opts)
     opts = opts or { empty = false }
 
-    local lsp_clients = vim.lsp.buf_get_clients(0)
-    if lsp_clients == nil or #lsp_clients < 1 then
+    if not utils.are_lsp_clients_running() then
         renamer._log.error(strings.no_lsp_client_found_err)
+        return
     end
 
     local cword = vim.fn.expand(strings.cword_keyword)

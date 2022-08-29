@@ -1,5 +1,6 @@
 local renamer = require 'renamer'
 local strings = require('renamer.constants').strings
+local utils = require 'renamer.utils'
 
 local required_plugins = {
     { name = 'plenary' },
@@ -44,12 +45,20 @@ health.check = function()
     if required_plugins_installed then
         health.report.info(strings.found_required_plugins)
     else
-        health.report.info(strings.missing_required_plugins)
+        health.report.info(strings.missing_required_plugins_err)
     end
 
     health.report.start(strings.checking_setup_called)
     if renamer._buffers == nil then
-        health.report.warn(strings.setup_not_called)
+        health.report.warn(strings.setup_not_called_err)
+    else
+        health.report.ok(strings.setup_called)
+    end
+
+    if not utils.are_lsp_clients_running() then
+        health.report.error(strings.no_lsp_client_found_err)
+    else
+        health.report.ok(strings.lsp_client_found)
     end
 end
 

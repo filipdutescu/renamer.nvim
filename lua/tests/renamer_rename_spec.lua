@@ -16,26 +16,15 @@ describe('renamer', function()
             renamer.setup()
         end)
 
-        it('should not allow renaming if no LSP client is attached to the current buffer (nil value)', function()
-            local lsp_mock = mock(vim.lsp, true)
-            lsp_mock.buf_get_clients.returns(nil)
+        it('should not allow renaming if no LSP client is attached to the current buffer', function()
+            local lsp = stub(utils, 'are_lsp_clients_running')
             local create = stub(popup, 'create')
 
             renamer.rename()
 
             assert.spy(create).called_at_most(0)
-            mock.revert(lsp_mock)
-        end)
-
-        it('should not allow renaming if no LSP client is attached (less than 1 client)', function()
-            local lsp_mock = mock(vim.lsp, true)
-            lsp_mock.buf_get_clients.returns {}
-            local create = stub(popup, 'create')
-
-            renamer.rename()
-
-            assert.spy(create).called_at_most(0)
-            mock.revert(lsp_mock)
+            lsp.revert(lsp)
+            create.revert(create)
         end)
 
         it('should not allow renaming if word start is nil', function()

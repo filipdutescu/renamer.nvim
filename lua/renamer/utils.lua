@@ -80,4 +80,13 @@ function utils.set_qf_list(changes)
     end
 end
 
+function utils.are_lsp_clients_running()
+    local lsp_clients = vim.lsp.buf_get_clients(0)
+
+    if lsp_clients == nil or #lsp_clients < 1 then
+        return false
+    end
+    return true
+end
+
 return utils

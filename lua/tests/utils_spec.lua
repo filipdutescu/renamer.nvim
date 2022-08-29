@@ -1,5 +1,6 @@
 local utils = require 'renamer.utils'
 
+local mock = require 'luassert.mock'
 local stub = require 'luassert.stub'
 
 local eq = assert.are.same
@@ -218,6 +219,38 @@ describe('utils', function()
             get_buf_id.revert(get_buf_id)
             buf_load.revert(buf_load)
             setqflist.revert(setqflist)
+        end)
+    end)
+
+    describe('are_lsp_clients_running', function()
+        it('should return false if no LSP client is attached to the current buffer (nil value)', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns(nil)
+
+            local result = utils.are_lsp_clients_running()
+
+            assert(not result, 'utils.are_lsp_clients_running() should return false.')
+            mock.revert(lsp_mock)
+        end)
+
+        it('should return false if no LSP client is attached (less than 1 client)', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns {}
+
+            local result = utils.are_lsp_clients_running()
+
+            assert(not result, 'utils.are_lsp_clients_running() should return false.')
+            mock.revert(lsp_mock)
+        end)
+
+        it('should return true if an LSP client is attached', function()
+            local lsp_mock = mock(vim.lsp, true)
+            lsp_mock.buf_get_clients.returns { 'test' }
+
+            local result = utils.are_lsp_clients_running()
+
+            assert(result, 'utils.are_lsp_clients_running() should return true.')
+            mock.revert(lsp_mock)
         end)
     end)
 end)

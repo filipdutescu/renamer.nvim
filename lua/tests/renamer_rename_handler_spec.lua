@@ -13,7 +13,7 @@ describe('_rename_handler', function()
 
     before_each(function()
         renamer.setup { with_qf_list = false }
-        log = mock(renamer._log)
+        log = mock(renamer._log, true)
     end)
 
     after_each(function()

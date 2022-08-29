@@ -52,11 +52,13 @@ local strings = {
     plugin_installed_template = '"%s" installed.',
     plugin_not_found_template = '"%s" not found.',
     found_required_plugins = 'Found all required plugins.',
-    missing_required_plugins = 'Missing required plugins.',
+    missing_required_plugins_err = 'Missing required plugins.',
     checking_setup_called = 'Chechking whether setup was made...',
-    setup_not_called = '"renamer.setup()" not called. Please make sure setup is done before using the plugin.',
+    setup_not_called_err = '"renamer.setup()" not called. Please make sure setup is done before using the plugin.',
     invalid_type_err_template = 'Invalid type for "%s". Expected "%s", but found "%s".',
     no_lsp_client_found_err = 'No LSP client found for the current file, but "renamer" requires one to work.',
+    setup_called = '"renamer.setup()" called and plugin successfully initialized.',
+    lsp_client_found = 'LSP client running for the current file.',
 }
 
 return {

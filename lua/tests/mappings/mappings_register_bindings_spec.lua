@@ -43,13 +43,9 @@ describe('mappings', function()
 
             for key, _ in pairs(bindings) do
                 local action = string.format(strings.exec_keymap_action_command_template, key:gsub('<', '<lt>'))
-                assert.spy(set_keymap).was_called_with(
-                    buf_id,
-                    strings.insert_mode_short_string,
-                    key,
-                    action,
-                    mappings.keymap_opts
-                )
+                assert
+                    .spy(set_keymap)
+                    .was_called_with(buf_id, strings.insert_mode_short_string, key, action, mappings.keymap_opts)
             end
         end)
     end)
