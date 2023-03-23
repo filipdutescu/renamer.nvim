@@ -80,10 +80,17 @@ function utils.set_qf_list(changes)
     end
 end
 
+local function tablelength(T)
+    local count = 0
+    for _ in pairs(T) do
+        count = count + 1
+    end
+    return count
+end
+
 function utils.are_lsp_clients_running()
     local lsp_clients = vim.lsp.buf_get_clients(0)
-
-    if lsp_clients == nil or #lsp_clients < 1 then
+    if lsp_clients == nil or tablelength(lsp_clients) < 1 then
         return false
     end
     return true
