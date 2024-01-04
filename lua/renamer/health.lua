@@ -10,11 +10,11 @@ local required_plugins = {
 --- @field public report table Has the reporting functions (e.g. ok, error)
 local health = {}
 health.report = {
-    start = vim.fn[strings.health_report_start],
-    ok = vim.fn[strings.health_report_ok],
-    warn = vim.fn[strings.health_report_warn],
-    error = vim.fn[strings.health_report_error],
-    info = vim.fn[strings.health_report_info],
+    start = vim.health.start,
+    ok = vim.health.ok,
+    warn = vim.health.warn,
+    error = vim.health.error,
+    info = vim.health.info,
 }
 
 health._is_plugin_installed = function(plugin_name)
